@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 
+import 'views/bottom_navigation_bar/hills_list_view.dart';
+import 'views/bottom_navigation_bar/hills_map_view.dart';
+import 'views/bottom_navigation_bar/profile_view.dart';
+
 void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -17,14 +23,45 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
+  MyHomePage({Key? key}) : super(key: key);
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  int _currentIndex = 0;
+
+  final List<Widget> _navigationBarViews = [
+    HillsMapView(),
+    const HillsListView(),
+    const ProfileView()
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Flutter Demo Home Page'),
+      appBar: AppBar(title: const Text('TobogganApp'), actions: [
+        _currentIndex < 2
+            ? IconButton(onPressed: () {}, icon: const Icon(Icons.add))
+            : Container()
+      ]),
+      body: _navigationBarViews[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.map), label: "Map"),
+          BottomNavigationBarItem(icon: Icon(Icons.list), label: "List"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.account_circle), label: "Profile")
+        ],
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
       ),
-      body: Center(),
     );
   }
 }
