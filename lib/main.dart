@@ -45,7 +45,10 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(title: const Text('TobogganApp'), actions: [
         _currentIndex < 2
             ? IconButton(onPressed: () {}, icon: const Icon(Icons.add))
-            : Container()
+            : TextButton(
+                onPressed: () {},
+                child:
+                    const Text("Logout", style: TextStyle(color: Colors.white)))
       ]),
       body: _navigationBarViews[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -59,6 +62,10 @@ class _MyHomePageState extends State<MyHomePage> {
         onTap: (index) {
           setState(() {
             _currentIndex = index;
+            // hide the bottom sheet if it is showing
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            }
           });
         },
       ),
