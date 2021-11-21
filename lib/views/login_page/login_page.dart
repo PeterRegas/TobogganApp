@@ -40,20 +40,33 @@ class _LoginState extends State<Login> {
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.5,
-                    height: MediaQuery.of(context).size.height * 0.3,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        fit: BoxFit.fill,
-                        image: AssetImage('images/logo.png'),
-                      ),
-                    ),
+                  Text("TobogganApp",
+                      style: TextStyle(fontSize: 50, fontFamily: 'Lucida')),
+                  // Container(
+                  //   width: MediaQuery.of(context).size.width * 0.6,
+                  //   height: MediaQuery.of(context).size.height * 0.2,
+                  //   decoration: BoxDecoration(
+                  //     image: DecorationImage(
+                  //       fit: BoxFit.fill,
+                  //       image: AssetImage('images/logo.png'),
+                  //     ),
+                  //   ),
+                  // ),
+                  SizedBox(
+                    height: 10,
                   ),
                   TextFormField(
                     decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.mail_outline),
                       label: Text('Email', style: TextStyle(fontSize: 16)),
-                      // icon: Icon(Icons.email),
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                          borderSide: BorderSide(color: Colors.blue)),
+                      enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide.none,
+                          borderRadius:
+                              BorderRadius.all(Radius.circular(10.0))),
+                      filled: true,
                     ),
                     validator: (value) {
                       if (value == null || !value.contains('@')) {
@@ -69,8 +82,16 @@ class _LoginState extends State<Login> {
                   TextFormField(
                     obscureText: true,
                     decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.lock_outline),
                       label: Text('Password', style: TextStyle(fontSize: 16)),
-                      // icon: Icon(Icons.password),
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                          borderSide: BorderSide(color: Colors.blue)),
+                      enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide.none,
+                          borderRadius:
+                              BorderRadius.all(Radius.circular(10.0))),
+                      filled: true,
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -93,6 +114,10 @@ class _LoginState extends State<Login> {
                         if (_formKey.currentState!.validate()) {
                           _formKey.currentState!.save();
                           print('$_email $_password');
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => MyHomePage()));
                         }
                       },
                       child: Text('LOG IN',
