@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'views/bottom_navigation_bar/hills_list_view.dart';
 import 'views/bottom_navigation_bar/hills_map_view.dart';
 import 'views/bottom_navigation_bar/profile_view.dart';
+import 'views/login_page/login_page.dart';
 
 void main() {
   runApp(MyApp());
@@ -46,7 +47,12 @@ class _MyHomePageState extends State<MyHomePage> {
         _currentIndex < 2
             ? IconButton(onPressed: () {}, icon: const Icon(Icons.add))
             : TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginPage()),
+                  );
+                },
                 child:
                     const Text("Logout", style: TextStyle(color: Colors.white)))
       ]),
