@@ -3,6 +3,8 @@ import 'package:flutter_map/plugin_api.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:tobogganapp/views/hill_info_bottom_sheet.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 
 class HillsMapView extends StatefulWidget {
   const HillsMapView({Key? key}) : super(key: key);
@@ -12,6 +14,8 @@ class HillsMapView extends StatefulWidget {
 }
 
 class _HillsMapViewState extends State<HillsMapView> {
+  final MapController mapController = MapController();
+  LatLng _currentLocation = LatLng(43.944459, -78.896465);
   final LatLng otu = LatLng(43.944459, -78.896465);
   final LatLng otu2 = LatLng(43.945905, -78.897293);
   // keeps track of what marker we have selected, helps change the marker's colour
@@ -22,6 +26,7 @@ class _HillsMapViewState extends State<HillsMapView> {
     return Stack(
       children: [
         FlutterMap(
+          mapController: mapController,
           options: MapOptions(
               center: otu,
               zoom: 16.0,
@@ -127,7 +132,14 @@ class _HillsMapViewState extends State<HillsMapView> {
           showIfOpened: false,
           child: CircularButton(
             icon: const Icon(Icons.place),
-            onPressed: () {},
+            onPressed: () async {
+              var position = await _getCurrentPosition();
+              setState(() {
+                _currentLocation =
+                    LatLng(position.latitude, position.longitude);
+                mapController.move(_currentLocation, 16.0);
+              });
+            },
           ),
         ),
         FloatingSearchBarAction.searchToClear(
@@ -138,5 +150,23 @@ class _HillsMapViewState extends State<HillsMapView> {
         return Container();
       },
     );
+  }
+
+  Future<Position> _getCurrentPosition() async {
+    if (await Geolocator.isLocationServiceEnabled()) {
+      return await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.best);
+    }
+
+    await Geolocator.requestPermission();
+    return Position(
+        latitude: 43.944459,
+        longitude: -78.896465,
+        timestamp: DateTime.now(),
+        accuracy: 0.0,
+        altitude: 0.0,
+        heading: 0.0,
+        speed: 0.0,
+        speedAccuracy: 0.0);
   }
 }
