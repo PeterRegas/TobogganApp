@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "169894503996",
+    "project_id": "tobogganapp",
+    "storage_bucket": "tobogganapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:169894503996:android:d2c9981c9c4d6c9aef4539",
+        "android_client_info": {
+          "package_name": "com.example.tobogganapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "169894503996-j83940ofptamahm2f7247ts45skvj9ev.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoUx1eFmzL-pVkhNViUtuILGtmK6EK9Tg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "169894503996-j83940ofptamahm2f7247ts45skvj9ev.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
