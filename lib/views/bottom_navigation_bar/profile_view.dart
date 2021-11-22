@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'profile_navigation/profile_bookmarks_view.dart';
+import 'profile_navigation/profile_photos_view.dart';
+import 'profile_navigation/profile_reviews_view.dart';
+
 class ProfileView extends StatelessWidget {
   const ProfileView({Key? key}) : super(key: key);
 
@@ -65,20 +69,29 @@ class ProfileView extends StatelessWidget {
               ListTile(
                 leading: const Icon(Icons.bookmark, color: Colors.blue),
                 title: const Text("Bookmarks"),
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const BookmarkView()));
+                },
               ),
               const Divider(thickness: 1),
               ListTile(
                 leading: const Icon(Icons.star, color: Colors.blue, size: 30),
                 title: const Text("Reviews"),
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const ReviewView()));
+                },
               ),
               const Divider(thickness: 1),
               ListTile(
                 leading: const Icon(Icons.photo_camera,
                     color: Colors.blue, size: 30),
                 title: const Text("Photos"),
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const PhotoView()));
+                },
               ),
               const Divider(thickness: 1)
             ],
