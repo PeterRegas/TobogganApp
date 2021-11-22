@@ -52,6 +52,12 @@ class _CreateAccountState extends State<CreateAccount> {
                 decoration: InputDecoration(
                   prefixIcon: Icon(Icons.mail_outline),
                   label: Text('Email', style: TextStyle(fontSize: 16)),
+                  errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                      borderSide: BorderSide(color: Colors.red)),
+                  focusedErrorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                      borderSide: BorderSide(color: Colors.red)),
                   focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(10.0)),
                       borderSide: BorderSide(color: Colors.blue)),
@@ -77,6 +83,12 @@ class _CreateAccountState extends State<CreateAccount> {
                 decoration: InputDecoration(
                   prefixIcon: Icon(Icons.person_outline),
                   label: Text('Username', style: TextStyle(fontSize: 16)),
+                  errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                      borderSide: BorderSide(color: Colors.red)),
+                  focusedErrorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                      borderSide: BorderSide(color: Colors.red)),
                   focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(10.0)),
                       borderSide: BorderSide(color: Colors.blue)),
@@ -103,6 +115,12 @@ class _CreateAccountState extends State<CreateAccount> {
                 decoration: InputDecoration(
                   prefixIcon: Icon(Icons.lock_outline),
                   label: Text('Password', style: TextStyle(fontSize: 16)),
+                  errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                      borderSide: BorderSide(color: Colors.red)),
+                  focusedErrorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                      borderSide: BorderSide(color: Colors.red)),
                   focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(10.0)),
                       borderSide: BorderSide(color: Colors.blue)),
@@ -133,6 +151,12 @@ class _CreateAccountState extends State<CreateAccount> {
                   prefixIcon: Icon(Icons.lock_outline),
                   label:
                       Text('Re-enter Password', style: TextStyle(fontSize: 16)),
+                  errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                      borderSide: BorderSide(color: Colors.red)),
+                  focusedErrorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                      borderSide: BorderSide(color: Colors.red)),
                   focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(10.0)),
                       borderSide: BorderSide(color: Colors.blue)),
@@ -165,6 +189,9 @@ class _CreateAccountState extends State<CreateAccount> {
                     if (_formKey.currentState!.validate()) {
                       _formKey.currentState!.save();
                       print('$_email $_password $_passConf $_username');
+                      if (Navigator.of(context).canPop()) {
+                        Navigator.of(context).pop();
+                      }
                       Navigator.pushReplacement(context,
                           MaterialPageRoute(builder: (context) => LoginPage()));
                     }
@@ -203,6 +230,9 @@ class _CreateAccountState extends State<CreateAccount> {
                     primary: Colors.blue,
                   ),
                   onPressed: () {
+                    if (Navigator.of(context).canPop()) {
+                      Navigator.of(context).pop();
+                    }
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => LoginPage()),

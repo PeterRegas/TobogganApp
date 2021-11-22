@@ -60,6 +60,12 @@ class _LoginState extends State<Login> {
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.mail_outline),
                       label: Text('Email', style: TextStyle(fontSize: 16)),
+                      errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                          borderSide: BorderSide(color: Colors.red)),
+                      focusedErrorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                          borderSide: BorderSide(color: Colors.red)),
                       focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(10.0)),
                           borderSide: BorderSide(color: Colors.blue)),
@@ -85,6 +91,12 @@ class _LoginState extends State<Login> {
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.lock_outline),
                       label: Text('Password', style: TextStyle(fontSize: 16)),
+                      errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                          borderSide: BorderSide(color: Colors.red)),
+                      focusedErrorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                          borderSide: BorderSide(color: Colors.red)),
                       focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(10.0)),
                           borderSide: BorderSide(color: Colors.blue)),
@@ -115,6 +127,9 @@ class _LoginState extends State<Login> {
                         if (_formKey.currentState!.validate()) {
                           _formKey.currentState!.save();
                           print('$_email $_password');
+                          if (Navigator.of(context).canPop()) {
+                            Navigator.of(context).pop();
+                          }
                           Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
@@ -148,6 +163,9 @@ class _LoginState extends State<Login> {
                         primary: Colors.grey[700],
                       ),
                       onPressed: () {
+                        if (Navigator.of(context).canPop()) {
+                          Navigator.of(context).pop();
+                        }
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(

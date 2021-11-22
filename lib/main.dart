@@ -35,7 +35,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
 
   final List<Widget> _navigationBarViews = [
-    HillsMapView(),
+    const HillsMapView(),
     const HillsListView(),
     const ProfileView()
   ];
@@ -48,7 +48,10 @@ class _MyHomePageState extends State<MyHomePage> {
             ? IconButton(onPressed: () {}, icon: const Icon(Icons.add))
             : TextButton(
                 onPressed: () {
-                  Navigator.push(
+                  if (Navigator.of(context).canPop()) {
+                    Navigator.of(context).pop();
+                  }
+                  Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => LoginPage()),
                   );
