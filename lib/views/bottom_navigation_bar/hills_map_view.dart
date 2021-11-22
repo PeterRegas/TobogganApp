@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:tobogganapp/views/hill_info_bottom_sheet.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 
 class HillsMapView extends StatefulWidget {
   const HillsMapView({Key? key}) : super(key: key);
@@ -11,6 +14,8 @@ class HillsMapView extends StatefulWidget {
 }
 
 class _HillsMapViewState extends State<HillsMapView> {
+  final MapController mapController = MapController();
+  LatLng _currentLocation = LatLng(43.944459, -78.896465);
   final LatLng otu = LatLng(43.944459, -78.896465);
   final LatLng otu2 = LatLng(43.945905, -78.897293);
   // keeps track of what marker we have selected, helps change the marker's colour
@@ -18,29 +23,35 @@ class _HillsMapViewState extends State<HillsMapView> {
 
   @override
   Widget build(BuildContext context) {
-    return FlutterMap(
-      options: MapOptions(
-          center: otu,
-          zoom: 16.0,
-          onTap: (pos, latlong) {
-            // hide the bottom sheet if visible
-            if (Navigator.of(context).canPop()) {
-              // set state needed to toggle marker colour
-              setState(() {
-                _selectedMarkerIndex = -1;
-                Navigator.of(context).pop();
-              });
-            }
-          }),
-      layers: [
-        TileLayerOptions(
-          urlTemplate:
-              "https://api.mapbox.com/styles/v1/tayloryoung/ckw2deumz3jo614rtffqghrre/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoidGF5bG9yeW91bmciLCJhIjoiY2t3MjU0eWN4MGE5YjMxcHhsMjRpd3A0OSJ9.7UmX8FwS_dQQXNd5lgKQIA",
+    return Stack(
+      children: [
+        FlutterMap(
+          mapController: mapController,
+          options: MapOptions(
+              center: otu,
+              zoom: 16.0,
+              onTap: (pos, latlong) {
+                // hide the bottom sheet if visible
+                if (Navigator.of(context).canPop()) {
+                  // set state needed to toggle marker colour
+                  setState(() {
+                    _selectedMarkerIndex = -1;
+                    Navigator.of(context).pop();
+                  });
+                }
+              }),
+          layers: [
+            TileLayerOptions(
+              urlTemplate:
+                  "https://api.mapbox.com/styles/v1/tayloryoung/ckw2deumz3jo614rtffqghrre/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoidGF5bG9yeW91bmciLCJhIjoiY2t3MjU0eWN4MGE5YjMxcHhsMjRpd3A0OSJ9.7UmX8FwS_dQQXNd5lgKQIA",
+            ),
+            MarkerLayerOptions(markers: [
+              getMarker(otu, 0, "OTU Park"),
+              getMarker(otu2, 1, "OTU Library Hill")
+            ])
+          ],
         ),
-        MarkerLayerOptions(markers: [
-          getMarker(otu, 0, "OTU Park"),
-          getMarker(otu2, 1, "OTU Library Hill")
-        ])
+        buildFloatingSearchBar()
       ],
     );
   }
@@ -85,5 +96,77 @@ class _HillsMapViewState extends State<HillsMapView> {
         );
       },
     );
+  }
+
+  // Modified from example at https://pub.dev/packages/material_floating_search_bar
+  Widget buildFloatingSearchBar() {
+    final FloatingSearchBarController controller =
+        FloatingSearchBarController();
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
+
+    return FloatingSearchBar(
+      controller: controller,
+      hint: 'Search...',
+      scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
+      transitionDuration: const Duration(milliseconds: 800),
+      transitionCurve: Curves.easeInOut,
+      physics: const BouncingScrollPhysics(),
+      axisAlignment: isPortrait ? 0.0 : -1.0,
+      openAxisAlignment: 0.0,
+      width: isPortrait ? 600 : 500,
+      debounceDelay: const Duration(milliseconds: 500),
+      automaticallyImplyBackButton: false,
+      onQueryChanged: (query) {
+        // Call your model, bloc, controller here.
+      },
+      onSubmitted: (search) {
+        print(search);
+        controller.close();
+      },
+      // Specify a custom transition to be used for
+      // animating between opened and closed stated.
+      transition: CircularFloatingSearchBarTransition(),
+      actions: [
+        FloatingSearchBarAction(
+          showIfOpened: false,
+          child: CircularButton(
+            icon: const Icon(Icons.place),
+            onPressed: () async {
+              var position = await _getCurrentPosition();
+              setState(() {
+                _currentLocation =
+                    LatLng(position.latitude, position.longitude);
+                mapController.move(_currentLocation, 16.0);
+              });
+            },
+          ),
+        ),
+        FloatingSearchBarAction.searchToClear(
+          showIfClosed: false,
+        ),
+      ],
+      builder: (context, transition) {
+        return Container();
+      },
+    );
+  }
+
+  Future<Position> _getCurrentPosition() async {
+    if (await Geolocator.isLocationServiceEnabled()) {
+      return await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.best);
+    }
+
+    await Geolocator.requestPermission();
+    return Position(
+        latitude: 43.944459,
+        longitude: -78.896465,
+        timestamp: DateTime.now(),
+        accuracy: 0.0,
+        altitude: 0.0,
+        heading: 0.0,
+        speed: 0.0,
+        speedAccuracy: 0.0);
   }
 }

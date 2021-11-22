@@ -36,6 +36,9 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_map:
   latlong:
+  material_floating_search_bar:
+  geolocator: ^7.7.1
+  geocoding: 
 
 dev_dependencies:
   flutter_test:
