@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tobogganapp/views/create_account/create_account.dart';
 import '/main.dart';
 
 class LoginPage extends StatelessWidget {
@@ -114,7 +115,7 @@ class _LoginState extends State<Login> {
                         if (_formKey.currentState!.validate()) {
                           _formKey.currentState!.save();
                           print('$_email $_password');
-                          Navigator.push(
+                          Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
                                   builder: (context) => MyHomePage()));
@@ -147,11 +148,11 @@ class _LoginState extends State<Login> {
                         primary: Colors.grey[700],
                       ),
                       onPressed: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //       builder: (context) => MyHomePage()),
-                        // );
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => CreateAccountPage()),
+                        );
                       },
                       child: Wrap(children: [
                         Icon(
