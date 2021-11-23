@@ -14,8 +14,10 @@ class HillsMapView extends StatefulWidget {
 }
 
 class _HillsMapViewState extends State<HillsMapView> {
-  final MapController mapController = MapController();
+  final MapController _mapController = MapController();
   LatLng _currentLocation = LatLng(43.944459, -78.896465);
+  String _searchQuery = "";
+  List<Location> _searchResults = [];
   final LatLng otu = LatLng(43.944459, -78.896465);
   final LatLng otu2 = LatLng(43.945905, -78.897293);
   // keeps track of what marker we have selected, helps change the marker's colour
@@ -26,7 +28,7 @@ class _HillsMapViewState extends State<HillsMapView> {
     return Stack(
       children: [
         FlutterMap(
-          mapController: mapController,
+          mapController: _mapController,
           options: MapOptions(
               center: otu,
               zoom: 16.0,
@@ -100,13 +102,13 @@ class _HillsMapViewState extends State<HillsMapView> {
 
   // Modified from example at https://pub.dev/packages/material_floating_search_bar
   Widget buildFloatingSearchBar() {
-    final FloatingSearchBarController controller =
+    final FloatingSearchBarController searchController =
         FloatingSearchBarController();
     final isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
 
     return FloatingSearchBar(
-      controller: controller,
+      controller: searchController,
       hint: 'Search...',
       scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
       transitionDuration: const Duration(milliseconds: 800),
@@ -120,10 +122,24 @@ class _HillsMapViewState extends State<HillsMapView> {
       onQueryChanged: (query) {
         // Call your model, bloc, controller here.
       },
-      onSubmitted: (search) {
-        print(search);
-        controller.close();
+      onSubmitted: (search) async {
+        List<Location> locations = [];
+        _searchQuery = search;
+
+        // if theres no results let the user know, else update search results
+        try {
+          locations = await locationFromAddress(search);
+        } on NoResultFoundException {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text("No results when searching for $search.")));
+        }
+
+        // update the body of the floating search bar with the new results
+        setState(() {
+          _searchResults = locations;
+        });
       },
+      clearQueryOnClose: false,
       // Specify a custom transition to be used for
       // animating between opened and closed stated.
       transition: CircularFloatingSearchBarTransition(),
@@ -137,7 +153,7 @@ class _HillsMapViewState extends State<HillsMapView> {
               setState(() {
                 _currentLocation =
                     LatLng(position.latitude, position.longitude);
-                mapController.move(_currentLocation, 16.0);
+                _mapController.move(_currentLocation, 16.0);
               });
             },
           ),
@@ -147,7 +163,42 @@ class _HillsMapViewState extends State<HillsMapView> {
         ),
       ],
       builder: (context, transition) {
-        return Container();
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Material(
+            color: Colors.white,
+            elevation: 4.0,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: _searchResults.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    var location = _searchResults[index];
+                    return ListTile(
+                      leading: const Icon(Icons.location_pin),
+                      title: Text(_searchQuery),
+                      subtitle:
+                          Text("(${location.latitude}, ${location.longitude})"),
+                      onTap: () {
+                        // Close and clear the search bar
+                        searchController.close();
+                        searchController.clear();
+                        _searchQuery = "";
+                        // move the map center to the newly selected location
+                        var latlng =
+                            LatLng(location.latitude, location.longitude);
+                        _mapController.move(latlng, 16.0);
+                      },
+                    );
+                  },
+                )
+              ],
+            ),
+          ),
+        );
       },
     );
   }
