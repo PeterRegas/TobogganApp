@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HillsListView extends StatelessWidget {
   const HillsListView({Key? key}) : super(key: key);
@@ -56,7 +57,14 @@ class HillInfoCard extends StatelessWidget {
                   children: [
                     TextButton(onPressed: () {}, child: const Text("BOOKMARK")),
                     TextButton(
-                        onPressed: () {}, child: const Text("DIRECTIONS"))
+                        onPressed: () async {
+                          // launch directions to hill
+                          var destination = "200 Simcoe St. North, Oshawa";
+                          String url =
+                              "https://www.google.com/maps/dir/?api=1&destination=$destination";
+                          await launch(Uri.encodeFull(url));
+                        },
+                        child: const Text("DIRECTIONS"))
                   ],
                 )
               ],
