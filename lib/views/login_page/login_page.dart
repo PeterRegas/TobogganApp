@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:tobogganapp/views/create_account/create_account.dart';
 import '/main.dart';
