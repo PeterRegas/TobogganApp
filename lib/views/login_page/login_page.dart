@@ -30,6 +30,7 @@ class _LoginState extends State<Login> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String? _email = '';
   String? _password = '';
+
   @override
   Widget build(BuildContext context) {
     double maxWidth = MediaQuery.of(context).size.width;
@@ -128,14 +129,14 @@ class _LoginState extends State<Login> {
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
                           _formKey.currentState!.save();
-                          print('$_email $_password');
+
                           try {
                             UserCredential userCredential = await FirebaseAuth
                                 .instance
                                 .signInWithEmailAndPassword(
                                     email: _email!, password: _password!);
                             var currentUser = FirebaseAuth.instance.currentUser;
-                            // print(currentUser!.uid);
+                            print(currentUser!.uid);
                             if (Navigator.canPop(context)) {
                               Navigator.pop(context);
                             }
@@ -144,10 +145,9 @@ class _LoginState extends State<Login> {
                                 MaterialPageRoute(
                                     builder: (context) => MyHomePage()));
                           } on FirebaseAuthException catch (e) {
-                            if (e.code == 'user-not-found') {
-                              print('No user found for that email.');
-                            } else if (e.code == 'wrong-password') {
-                              print('Wrong password provided for that user.');
+                            if ((e.code == 'user-not-found') ||
+                                (e.code == 'wrong-password')) {
+                              print('Incorrect email or password');
                             }
                           }
                         }
