@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import 'views/bottom_navigation_bar/hills_list_view.dart';
 import 'views/bottom_navigation_bar/hills_map_view.dart';
@@ -9,11 +10,68 @@ void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  // Set default `_initialized` and `_error` state to false
+  bool _initialized = false;
+  bool _error = false;
+
+  // Define an async function to initialize FlutterFire
+  void initializeFlutterFire() async {
+    try {
+      // Wait for Firebase to initialize and set `_initialized` state to true
+      await Firebase.initializeApp();
+      print("Connected to Firebase");
+      setState(() {
+        _initialized = true;
+      });
+    } catch (e) {
+      // Set `_error` state to true if Firebase initialization fails
+      setState(() {
+        _error = true;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    initializeFlutterFire();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // Show error message if initialization failed
+    if (_error) {
+      return MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: Container(
+            child: const Center(child: Text("Error connecting to Firebase")),
+            color: Colors.white),
+      );
+    }
+
+    // Show a loader until FlutterFire is initialized
+    if (!_initialized) {
+      return MaterialApp(
+          title: 'Flutter Demo',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+          home: Container(
+              child: const Center(child: CircularProgressIndicator()),
+              color: Colors.white));
+    }
+
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
