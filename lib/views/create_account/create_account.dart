@@ -27,7 +27,7 @@ class CreateAccount extends StatefulWidget {
 class _CreateAccountState extends State<CreateAccount> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String? _email = '';
-  String? _username = '';
+  String? _name = '';
   String? _passConf = '';
   String? _password = '';
   @override
@@ -82,7 +82,7 @@ class _CreateAccountState extends State<CreateAccount> {
               TextFormField(
                 decoration: InputDecoration(
                   prefixIcon: Icon(Icons.person_outline),
-                  label: Text('Username', style: TextStyle(fontSize: 16)),
+                  label: Text('Name', style: TextStyle(fontSize: 16)),
                   errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(10.0)),
                       borderSide: BorderSide(color: Colors.red)),
@@ -104,7 +104,7 @@ class _CreateAccountState extends State<CreateAccount> {
                   return null;
                 },
                 onSaved: (value) {
-                  _username = value;
+                  _name = value;
                 },
               ),
               SizedBox(
@@ -188,7 +188,7 @@ class _CreateAccountState extends State<CreateAccount> {
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       _formKey.currentState!.save();
-                      print('$_email $_password $_passConf $_username');
+                      print('$_email $_password $_passConf $_name');
                       if (Navigator.of(context).canPop()) {
                         Navigator.of(context).pop();
                       }
