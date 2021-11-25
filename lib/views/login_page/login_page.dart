@@ -1,5 +1,5 @@
 // ignore_for_file: prefer_const_constructors
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tobogganapp/views/create_account/create_account.dart';
 import '/main.dart';
@@ -33,7 +33,7 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     double maxWidth = MediaQuery.of(context).size.width;
-    double maxHeight = MediaQuery.of(context).size.height;
+    // double maxHeight = MediaQuery.of(context).size.height;
     return Form(
         key: _formKey,
         child: Container(
@@ -125,17 +125,31 @@ class _LoginState extends State<Login> {
                       style: ElevatedButton.styleFrom(
                         fixedSize: Size(maxWidth, 50),
                       ),
-                      onPressed: () {
+                      onPressed: () async {
                         if (_formKey.currentState!.validate()) {
                           _formKey.currentState!.save();
                           print('$_email $_password');
-                          if (Navigator.of(context).canPop()) {
-                            Navigator.of(context).pop();
+                          try {
+                            UserCredential userCredential = await FirebaseAuth
+                                .instance
+                                .signInWithEmailAndPassword(
+                                    email: _email!, password: _password!);
+                            var currentUser = FirebaseAuth.instance.currentUser;
+                            // print(currentUser!.uid);
+                            if (Navigator.canPop(context)) {
+                              Navigator.pop(context);
+                            }
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => MyHomePage()));
+                          } on FirebaseAuthException catch (e) {
+                            if (e.code == 'user-not-found') {
+                              print('No user found for that email.');
+                            } else if (e.code == 'wrong-password') {
+                              print('Wrong password provided for that user.');
+                            }
                           }
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => MyHomePage()));
                         }
                       },
                       child: Text('LOG IN',
