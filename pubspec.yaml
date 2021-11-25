@@ -42,6 +42,7 @@ dependencies:
   geolocator: ^7.7.1
   geocoding:
   url_launcher:
+  firebase_auth:
 
 dev_dependencies:
   flutter_test:
