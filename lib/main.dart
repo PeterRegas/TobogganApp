@@ -50,7 +50,7 @@ class _MyAppState extends State<MyApp> {
     // Show error message if initialization failed
     if (_error) {
       return MaterialApp(
-        title: 'Flutter Demo',
+        title: 'TobogganApp',
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
@@ -63,7 +63,7 @@ class _MyAppState extends State<MyApp> {
     // Show a loader until FlutterFire is initialized
     if (!_initialized) {
       return MaterialApp(
-          title: 'Flutter Demo',
+          title: 'TobogganApp',
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),
@@ -73,7 +73,7 @@ class _MyAppState extends State<MyApp> {
     }
 
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'TobogganApp',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),

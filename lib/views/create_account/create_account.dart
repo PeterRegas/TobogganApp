@@ -1,8 +1,10 @@
 // ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
 import '/main.dart';
 import 'package:tobogganapp/views/login_page/login_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 class CreateAccountPage extends StatelessWidget {
   const CreateAccountPage({Key? key}) : super(key: key);
@@ -191,17 +193,54 @@ class _CreateAccountState extends State<CreateAccount> {
                       fixedSize: Size(maxWidth, 50),
                       primary: Colors.grey[700],
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         _formKey.currentState!.save();
-                        print('$_email $_password $_passConf $_name');
-                        if (Navigator.of(context).canPop()) {
-                          Navigator.of(context).pop();
+                        try {
+                          UserCredential userCredential = await FirebaseAuth
+                              .instance
+                              .createUserWithEmailAndPassword(
+                                  email: _email!, password: _password!);
+                          var currentUser = FirebaseAuth.instance.currentUser;
+                          print(currentUser!.uid);
+
+                          var collection = FirebaseFirestore.instance
+                              .collection('user_data');
+                          collection
+                              .doc(currentUser.uid)
+                              .set({'name': _name})
+                              .then((_) => print('User collection added'))
+                              .catchError((error) =>
+                                  print('User collection add failed: $error'));
+
+                          final snackBar = SnackBar(
+                            content:
+                                const Text('Account successfully created!'),
+                            action: SnackBarAction(
+                              label: 'Log In',
+                              onPressed: () {
+                                if (Navigator.of(context).canPop()) {
+                                  Navigator.of(context).pop();
+                                }
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => LoginPage()));
+                              },
+                            ),
+                          );
+
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                          print(userCredential.user);
+                        } on FirebaseAuthException catch (e) {
+                          if (e.code == 'weak-password') {
+                            print('The password provided is too weak.');
+                          } else if (e.code == 'email-already-in-use') {
+                            print('The account already exists for that email.');
+                          }
+                        } catch (e) {
+                          print(e);
                         }
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => LoginPage()));
                       }
                     },
                     child: Wrap(children: [
