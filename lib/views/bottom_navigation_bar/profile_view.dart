@@ -1,11 +1,36 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'profile_navigation/profile_bookmarks_view.dart';
 import 'profile_navigation/profile_photos_view.dart';
 import 'profile_navigation/profile_reviews_view.dart';
 
-class ProfileView extends StatelessWidget {
+class ProfileView extends StatefulWidget {
   const ProfileView({Key? key}) : super(key: key);
+
+  @override
+  State<ProfileView> createState() => _ProfileViewState();
+}
+
+class _ProfileViewState extends State<ProfileView> {
+  String _name = "not logged in...";
+
+  @override
+  void initState() {
+    var currentUser = FirebaseAuth.instance.currentUser;
+
+    // fetch the current user and update profile if they are logged in
+    if (currentUser != null) {
+      FirebaseFirestore.instance
+          .collection("user_data")
+          .doc(currentUser.uid)
+          .get()
+          .then((snapshot) => _name = snapshot.data()!["name"]);
+    }
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,19 +54,20 @@ class ProfileView extends StatelessWidget {
                 alignment: Alignment.topCenter,
                 padding: const EdgeInsets.only(top: 150),
                 child: Column(
-                  children: const [
-                    CircleAvatar(
+                  children: [
+                    const CircleAvatar(
                       child: Icon(
                         Icons.account_circle,
                         size: 75,
                       ),
                       radius: 50,
                     ),
-                    SizedBox(height: 10),
-                    Text("Joe Smith",
-                        style: TextStyle(
+                    const SizedBox(height: 10),
+                    Text(_name,
+                        style: const TextStyle(
                             fontSize: 25, fontWeight: FontWeight.bold)),
-                    Text("Oshawa, ON", style: TextStyle(color: Colors.grey))
+                    const Text("Oshawa, ON",
+                        style: TextStyle(color: Colors.grey))
                   ],
                 ))
           ],
