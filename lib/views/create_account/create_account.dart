@@ -234,9 +234,10 @@ class _CreateAccountState extends State<CreateAccount> {
                           print(userCredential.user);
                         } on FirebaseAuthException catch (e) {
                           if (e.code == 'weak-password') {
-                            print('The password provided is too weak.');
+                            snackBar('Password is too weak');
                           } else if (e.code == 'email-already-in-use') {
-                            print('The account already exists for that email.');
+                            snackBar(
+                                'The account already exists for this email.');
                           }
                         } catch (e) {
                           print(e);
@@ -293,5 +294,10 @@ class _CreateAccountState extends State<CreateAccount> {
                     ])),
               ])),
         ));
+  }
+
+  snackBar(String msg) {
+    final snackBar = SnackBar(content: Text(msg));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }
