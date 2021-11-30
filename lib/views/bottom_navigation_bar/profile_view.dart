@@ -14,7 +14,7 @@ class ProfileView extends StatefulWidget {
 }
 
 class _ProfileViewState extends State<ProfileView> {
-  String _name = "not logged in...";
+  String _name = "";
 
   @override
   void initState() {

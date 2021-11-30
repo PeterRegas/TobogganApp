@@ -131,12 +131,9 @@ class _LoginState extends State<Login> {
                         _formKey.currentState!.save();
 
                         try {
-                          UserCredential userCredential = await FirebaseAuth
-                              .instance
+                          await FirebaseAuth.instance
                               .signInWithEmailAndPassword(
                                   email: _email!, password: _password!);
-                          var currentUser = FirebaseAuth.instance.currentUser;
-                          print(currentUser!.uid);
                           if (Navigator.canPop(context)) {
                             Navigator.pop(context);
                           }

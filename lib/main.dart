@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -21,6 +22,7 @@ class _MyAppState extends State<MyApp> {
   // Set default `_initialized` and `_error` state to false
   bool _initialized = false;
   bool _error = false;
+  bool _loggedIn = false;
 
   // Define an async function to initialize FlutterFire
   void initializeFlutterFire() async {
@@ -30,6 +32,10 @@ class _MyAppState extends State<MyApp> {
       print("Connected to Firebase");
       setState(() {
         _initialized = true;
+        // determine if the user is logged in already
+        if (FirebaseAuth.instance.currentUser != null) {
+          _loggedIn = true;
+        }
       });
     } catch (e) {
       // Set `_error` state to true if Firebase initialization fails
@@ -77,7 +83,7 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(),
+      home: _loggedIn ? MyHomePage() : const LoginPage(),
     );
   }
 }
@@ -105,13 +111,14 @@ class _MyHomePageState extends State<MyHomePage> {
         _currentIndex < 2
             ? IconButton(onPressed: () {}, icon: const Icon(Icons.add))
             : TextButton(
-                onPressed: () {
+                onPressed: () async {
                   if (Navigator.of(context).canPop()) {
                     Navigator.of(context).pop();
                   }
+                  await FirebaseAuth.instance.signOut();
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => LoginPage()),
+                    MaterialPageRoute(builder: (context) => const LoginPage()),
                   );
                 },
                 child:
