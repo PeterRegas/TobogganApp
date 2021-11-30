@@ -26,7 +26,11 @@ class _ProfileViewState extends State<ProfileView> {
           .collection("user_data")
           .doc(currentUser.uid)
           .get()
-          .then((snapshot) => _name = snapshot.data()!["name"]);
+          .then((snapshot) {
+        setState(() {
+          _name = snapshot.data()!["name"];
+        });
+      });
     }
 
     super.initState();
