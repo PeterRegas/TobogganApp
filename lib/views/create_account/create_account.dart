@@ -208,7 +208,7 @@ class _CreateAccountState extends State<CreateAccount> {
                               .collection('user_data');
                           collection
                               .doc(currentUser.uid)
-                              .set({'name': _name})
+                              .set({'name': _name, 'bookmarks': []})
                               .then((_) => print('User collection added'))
                               .catchError((error) =>
                                   print('User collection add failed: $error'));
