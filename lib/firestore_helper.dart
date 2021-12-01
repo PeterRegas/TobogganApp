@@ -9,6 +9,14 @@ import 'model/hill.dart';
 import 'model/review.dart';
 
 class FirestoreHelper {
+  static Future<String> getNameForUserId(String userID) async {
+    var result = await FirebaseFirestore.instance
+        .collection("user_data")
+        .doc(userID)
+        .get();
+    return result.data()!["name"];
+  }
+
   static Future<List<Review>> getReviewsForHill(String hillID) async {
     List<Review> reviews = [];
 

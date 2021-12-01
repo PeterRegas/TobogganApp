@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:tobogganapp/firestore_helper.dart';
 
 import 'views/bottom_navigation_bar/hills_list_view.dart';
 import 'views/bottom_navigation_bar/hills_map_view.dart';
@@ -12,7 +13,12 @@ void main() {
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+  // user properties, shown on ProfileView
+  late String _name;
+  late int _numOfReviews;
+  late int _numOfPhotos;
+
+  MyApp({Key? key}) : super(key: key);
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -30,12 +36,29 @@ class _MyAppState extends State<MyApp> {
       // Wait for Firebase to initialize and set `_initialized` state to true
       await Firebase.initializeApp();
       print("Connected to Firebase");
+
+      // determine if user is logged in already
+      if (FirebaseAuth.instance.currentUser != null) {
+        _loggedIn = true;
+      }
+
+      if (_loggedIn) {
+        String uid = FirebaseAuth.instance.currentUser!.uid;
+        String name = await FirestoreHelper.getNameForUserId(uid);
+        int numOfPhotos = (await FirestoreHelper.getReviewsForUser(uid)).length;
+        int numOfReviews =
+            (await FirestoreHelper.getReviewsForUser(uid)).length;
+
+        setState(() {
+          widget._name = name;
+          widget._numOfPhotos = numOfPhotos;
+          widget._numOfReviews = numOfReviews;
+        });
+      }
+
+      // finished initialization
       setState(() {
         _initialized = true;
-        // determine if the user is logged in already
-        if (FirebaseAuth.instance.currentUser != null) {
-          _loggedIn = true;
-        }
       });
     } catch (e) {
       // Set `_error` state to true if Firebase initialization fails
@@ -83,13 +106,21 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: _loggedIn ? MyHomePage() : const LoginPage(),
+      home: _loggedIn
+          ? MyHomePage(widget._name, widget._numOfReviews, widget._numOfPhotos)
+          : const LoginPage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key}) : super(key: key);
+  final String _name;
+  final int _numOfReviews;
+  final int _numOfPhotos;
+
+  const MyHomePage(this._name, this._numOfReviews, this._numOfPhotos,
+      {Key? key})
+      : super(key: key);
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -97,12 +128,17 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
+  late final List<Widget> _navigationBarViews;
 
-  final List<Widget> _navigationBarViews = [
-    const HillsMapView(),
-    const HillsListView(),
-    const ProfileView()
-  ];
+  @override
+  void initState() {
+    _navigationBarViews = [
+      const HillsMapView(),
+      const HillsListView(),
+      ProfileView(widget._name, widget._numOfReviews, widget._numOfPhotos),
+    ];
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

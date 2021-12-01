@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:tobogganapp/firestore_helper.dart';
 import 'package:tobogganapp/views/create_account/create_account.dart';
 import '/main.dart';
 
@@ -137,10 +138,22 @@ class _LoginState extends State<Login> {
                           if (Navigator.canPop(context)) {
                             Navigator.pop(context);
                           }
+                          // fetch user data for ProfileView
+                          String uid = FirebaseAuth.instance.currentUser!.uid;
+                          String name =
+                              await FirestoreHelper.getNameForUserId(uid);
+                          int numOfReviews =
+                              (await FirestoreHelper.getReviewsForUser(uid))
+                                  .length;
+                          int numOfPhotos =
+                              (await FirestoreHelper.getReviewsForUser(uid))
+                                  .length;
+
                           Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => MyHomePage()));
+                                  builder: (context) => MyHomePage(
+                                      name, numOfReviews, numOfPhotos)));
                         } on FirebaseAuthException catch (e) {
                           if ((e.code == 'user-not-found') ||
                               (e.code == 'wrong-password')) {

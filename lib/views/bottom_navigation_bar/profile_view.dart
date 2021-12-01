@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'profile_navigation/profile_bookmarks_view.dart';
@@ -7,35 +5,19 @@ import 'profile_navigation/profile_photos_view.dart';
 import 'profile_navigation/profile_reviews_view.dart';
 
 class ProfileView extends StatefulWidget {
-  const ProfileView({Key? key}) : super(key: key);
+  final String _name;
+  final int _numOfReviews;
+  final int _numOfPhotos;
+
+  const ProfileView(this._name, this._numOfReviews, this._numOfPhotos,
+      {Key? key})
+      : super(key: key);
 
   @override
   State<ProfileView> createState() => _ProfileViewState();
 }
 
 class _ProfileViewState extends State<ProfileView> {
-  String _name = "";
-
-  @override
-  void initState() {
-    var currentUser = FirebaseAuth.instance.currentUser;
-
-    // fetch the current user and update profile if they are logged in
-    if (currentUser != null) {
-      FirebaseFirestore.instance
-          .collection("user_data")
-          .doc(currentUser.uid)
-          .get()
-          .then((snapshot) {
-        setState(() {
-          _name = snapshot.data()!["name"];
-        });
-      });
-    }
-
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return ListView(
@@ -67,7 +49,7 @@ class _ProfileViewState extends State<ProfileView> {
                       radius: 50,
                     ),
                     const SizedBox(height: 10),
-                    Text(_name,
+                    Text(widget._name,
                         style: const TextStyle(
                             fontSize: 25, fontWeight: FontWeight.bold)),
                     const Text("Oshawa, ON",
@@ -79,14 +61,16 @@ class _ProfileViewState extends State<ProfileView> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            const Text("3 reviews", style: TextStyle(fontSize: 16)),
+            Text("${widget._numOfReviews} reviews",
+                style: const TextStyle(fontSize: 16)),
             SizedBox(
                 child: Container(
                   child: Text("|", style: TextStyle(color: Colors.grey[600])),
                   alignment: Alignment.center,
                 ),
                 width: 20),
-            const Text("4 photos", style: TextStyle(fontSize: 16))
+            Text("${widget._numOfPhotos} photos",
+                style: const TextStyle(fontSize: 16))
           ],
         ),
         Padding(
