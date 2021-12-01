@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
+import 'package:tobogganapp/firestore_helper.dart';
+import 'package:tobogganapp/model/hill.dart';
 import 'package:tobogganapp/views/hill_info_bottom_sheet.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
@@ -18,10 +20,15 @@ class _HillsMapViewState extends State<HillsMapView> {
   LatLng _currentLocation = LatLng(43.944459, -78.896465);
   String _searchQuery = "";
   List<Location> _searchResults = [];
-  final LatLng otu = LatLng(43.944459, -78.896465);
-  final LatLng otu2 = LatLng(43.945905, -78.897293);
+  List<Marker> _markers = [];
   // keeps track of what marker we have selected, helps change the marker's colour
   int _selectedMarkerIndex = -1;
+
+  @override
+  void initState() {
+    loadMarkers();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +37,7 @@ class _HillsMapViewState extends State<HillsMapView> {
         FlutterMap(
           mapController: _mapController,
           options: MapOptions(
-              center: otu,
+              center: _currentLocation,
               zoom: 16.0,
               onTap: (pos, latlong) {
                 // hide the bottom sheet if visible
@@ -47,10 +54,7 @@ class _HillsMapViewState extends State<HillsMapView> {
               urlTemplate:
                   "https://api.mapbox.com/styles/v1/tayloryoung/ckw2deumz3jo614rtffqghrre/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoidGF5bG9yeW91bmciLCJhIjoiY2t3MjU0eWN4MGE5YjMxcHhsMjRpd3A0OSJ9.7UmX8FwS_dQQXNd5lgKQIA",
             ),
-            MarkerLayerOptions(markers: [
-              getMarker(otu, 0, "OTU Park"),
-              getMarker(otu2, 1, "OTU Library Hill")
-            ])
+            MarkerLayerOptions(markers: _markers)
           ],
         ),
         buildFloatingSearchBar()
@@ -58,9 +62,21 @@ class _HillsMapViewState extends State<HillsMapView> {
     );
   }
 
-  Marker getMarker(LatLng point, int index, String hillName) {
+  Future<void> loadMarkers() async {
+    List<Hill> hills = await FirestoreHelper.getAllHills();
+    List<Marker> hillMarkers = [];
+    for (int i = 0; i < hills.length; i++) {
+      hillMarkers.add(getMarker(hills[i], i));
+    }
+
+    setState(() {
+      _markers = hillMarkers;
+    });
+  }
+
+  Marker getMarker(Hill hill, int index) {
     return Marker(
-      point: point,
+      point: hill.geopoint,
       builder: (BuildContext context) {
         return GestureDetector(
           child: CircleAvatar(
@@ -81,8 +97,8 @@ class _HillsMapViewState extends State<HillsMapView> {
                 if (_selectedMarkerIndex != index) {
                   // show new bottom sheet (for different hill) and update index
                   _selectedMarkerIndex = index;
-                  Scaffold.of(context).showBottomSheet(
-                      (context) => HillInfoBottomSheet(hillName));
+                  Scaffold.of(context)
+                      .showBottomSheet((context) => HillInfoBottomSheet(hill));
                 } else {
                   // User re-selected the currently selected marker
                   _selectedMarkerIndex = -1;
@@ -90,8 +106,8 @@ class _HillsMapViewState extends State<HillsMapView> {
               } else {
                 // No marker currently selected, show the sheet for the hill
                 _selectedMarkerIndex = index;
-                Scaffold.of(context).showBottomSheet(
-                    (context) => HillInfoBottomSheet(hillName));
+                Scaffold.of(context)
+                    .showBottomSheet((context) => HillInfoBottomSheet(hill));
               }
             });
           },
