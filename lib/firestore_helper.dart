@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 import 'model/hill.dart';
 import 'model/review.dart';
@@ -140,27 +144,92 @@ class FirestoreHelper {
     return bookmarkedHills;
   }
 
-  static Future<void> addHill(Hill hill) async {
+  static Future<void> addHill(String name, XFile featuredPhoto, String address,
+      String information, GeoPoint geoPoint) async {
     CollectionReference hills = FirebaseFirestore.instance.collection('hills');
-    await hills.add({
-      "name": hill.name,
-      "featuredPhoto": hill.featuredPhoto,
-      "address": hill.address,
-      "information": hill.information,
-      "geopoint": GeoPoint(hill.geopoint.latitude, hill.geopoint.longitude),
+
+    // add new hill, featuredPhoto blank at first
+    var doc = await hills.add({
+      "name": name,
+      "featuredPhoto": "",
+      "address": address,
+      "information": information,
+      "geopoint": geoPoint,
+    });
+
+    // upload featured photo
+    var photoPath =
+        await FirestoreHelper._uploadHillFeaturedPhoto(featuredPhoto, doc.id);
+
+    // update featured photo path for hill in database
+    await hills.doc(doc.id).update({"featuredPhoto": photoPath});
+  }
+
+  static Future<void> addReview(
+      String hillID,
+      String reviewText,
+      List<XFile> photos,
+      String rating,
+      String reviewerID,
+      String reviewerName) async {
+    CollectionReference reviews =
+        FirebaseFirestore.instance.collection('reviews');
+
+    // upload review photos
+    List<String> photoPaths = [];
+    for (var photo in photos) {
+      var photoPath =
+          await FirestoreHelper._uploadReviewPhoto(photo, hillID, reviewerID);
+      // if upload was successful, save path in review
+      if (photoPath != null) {
+        photoPaths.add(photoPath);
+      }
+    }
+
+    await reviews.add({
+      "hill": hillID,
+      "reviewText": reviewText,
+      "photos": photoPaths,
+      "rating": rating,
+      "reviewerID": reviewerID,
+      "reviewerName": reviewerName
     });
   }
 
-  static Future<void> addReview(Review review) async {
-    CollectionReference reviews =
-        FirebaseFirestore.instance.collection('reviews');
-    await reviews.add({
-      "hill": review.hillID,
-      "reviewText": review.reviewText,
-      "photos": review.photos,
-      "rating": review.rating,
-      "reviewerID": review.reviewerID,
-      "reviewerName": review.reviewerName
-    });
+  static Future<String?> _uploadReviewPhoto(
+      XFile photo, String hillID, String reviewerID) async {
+    File file = File(photo.path);
+
+    String photoName =
+        "$hillID-$reviewerID-${DateTime.now().millisecondsSinceEpoch}";
+
+    try {
+      await firebase_storage.FirebaseStorage.instance
+          .ref('review_photos/$photoName.png')
+          .putFile(file);
+      return "review_photos/$photoName.png";
+    } on FirebaseException catch (e) {
+      // return null if there was an error trying to upload file
+      print("Error trying to upload review photo $photoName");
+      return null;
+    }
+  }
+
+  static Future<String?> _uploadHillFeaturedPhoto(
+      XFile photo, String hillID) async {
+    File file = File(photo.path);
+
+    String photoName = hillID;
+
+    try {
+      await firebase_storage.FirebaseStorage.instance
+          .ref('hill_featured_photos/$photoName.png')
+          .putFile(file);
+      return "hill_featured_photos/$photoName.png";
+    } on FirebaseException catch (e) {
+      // return null if there was an error trying to upload file
+      print("Error trying to upload featured photo for hill $hillID");
+      return null;
+    }
   }
 }
