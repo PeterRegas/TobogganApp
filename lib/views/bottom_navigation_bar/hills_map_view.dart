@@ -4,6 +4,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:tobogganapp/firestore_helper.dart';
 import 'package:tobogganapp/model/hill.dart';
+import 'package:tobogganapp/views/bottom_navigation_bar/hill_details.dart';
 import 'package:tobogganapp/views/hill_info_bottom_sheet.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
@@ -17,7 +18,7 @@ class HillsMapView extends StatefulWidget {
 
 class _HillsMapViewState extends State<HillsMapView> {
   final MapController _mapController = MapController();
-  LatLng _currentLocation = LatLng(43.944459, -78.896465);
+  late LatLng _userLocation;
   String _searchQuery = "";
   List<Location> _searchResults = [];
   List<Marker> _markers = [];
@@ -37,7 +38,7 @@ class _HillsMapViewState extends State<HillsMapView> {
         FlutterMap(
           mapController: _mapController,
           options: MapOptions(
-              center: _currentLocation,
+              center: LatLng(43.944459, -78.896465),
               zoom: 16.0,
               onTap: (pos, latlong) {
                 // hide the bottom sheet if visible
@@ -63,6 +64,11 @@ class _HillsMapViewState extends State<HillsMapView> {
   }
 
   Future<void> loadMarkers() async {
+    // fetch most recent position if available, else return current position
+    var lastKnownPosition = await Geolocator.getLastKnownPosition();
+    var position = lastKnownPosition ?? await _getCurrentPosition();
+
+    // load the markers
     List<Hill> hills = await FirestoreHelper.getAllHills();
     List<Marker> hillMarkers = [];
     for (int i = 0; i < hills.length; i++) {
@@ -71,6 +77,7 @@ class _HillsMapViewState extends State<HillsMapView> {
 
     setState(() {
       _markers = hillMarkers;
+      _userLocation = LatLng(position.latitude, position.longitude);
     });
   }
 
@@ -97,8 +104,8 @@ class _HillsMapViewState extends State<HillsMapView> {
                 if (_selectedMarkerIndex != index) {
                   // show new bottom sheet (for different hill) and update index
                   _selectedMarkerIndex = index;
-                  Scaffold.of(context)
-                      .showBottomSheet((context) => HillInfoBottomSheet(hill));
+                  Scaffold.of(context).showBottomSheet(
+                      (context) => HillInfoBottomSheet(hill, _userLocation));
                 } else {
                   // User re-selected the currently selected marker
                   _selectedMarkerIndex = -1;
@@ -106,8 +113,17 @@ class _HillsMapViewState extends State<HillsMapView> {
               } else {
                 // No marker currently selected, show the sheet for the hill
                 _selectedMarkerIndex = index;
-                Scaffold.of(context)
-                    .showBottomSheet((context) => HillInfoBottomSheet(hill));
+                Scaffold.of(context).showBottomSheet(
+                  (context) => GestureDetector(
+                    child: HillInfoBottomSheet(hill, _userLocation),
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => Hilldetails()));
+                    },
+                  ),
+                );
               }
             });
           },
@@ -167,9 +183,9 @@ class _HillsMapViewState extends State<HillsMapView> {
             onPressed: () async {
               var position = await _getCurrentPosition();
               setState(() {
-                _currentLocation =
-                    LatLng(position.latitude, position.longitude);
-                _mapController.move(_currentLocation, 16.0);
+                _userLocation = LatLng(position.latitude, position.longitude);
+                _mapController.move(
+                    LatLng(position.latitude, position.longitude), 16.0);
               });
             },
           ),

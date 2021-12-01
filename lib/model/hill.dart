@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:tobogganapp/model/review.dart';
 
@@ -32,4 +33,11 @@ class Hill {
 
   Hill(this.hillID, this.name, this.featuredPhoto, this.address,
       this.information, this.geopoint, this.reviews);
+
+  double distanceFrom(LatLng location) {
+    var distanceInMeters = Geolocator.distanceBetween(geopoint.latitude,
+        geopoint.longitude, location.latitude, location.longitude);
+    // conver to km and return
+    return double.parse((distanceInMeters / 1000).toStringAsFixed(1));
+  }
 }

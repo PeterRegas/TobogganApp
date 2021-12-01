@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:tobogganapp/model/hill.dart';
 
 class HillInfoBottomSheet extends StatelessWidget {
-  const HillInfoBottomSheet(this.hill, {Key? key}) : super(key: key);
+  const HillInfoBottomSheet(this.hill, this.userLocation, {Key? key})
+      : super(key: key);
 
   final Hill hill;
+  final LatLng userLocation;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +40,7 @@ class HillInfoBottomSheet extends StatelessWidget {
             const SizedBox(height: 5),
             Row(
               children: [
-                Text("${hill.address} ⋅ 12km",
+                Text("${hill.address} ⋅ ${hill.distanceFrom(userLocation)}km",
                     style: const TextStyle(color: Colors.grey, fontSize: 16)),
               ],
             )
