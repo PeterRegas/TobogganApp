@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tobogganapp/firestore_helper.dart';
+import '../review_page/review_page.dart';
 
 class Hilldetails extends StatelessWidget {
   @override
@@ -97,7 +98,16 @@ class _AddEventState extends State<AddEvent> {
                 Expanded(
                     child: Column(
                   children: [
-                    IconButton(onPressed: () {}, icon: Icon(Icons.star)),
+                    IconButton(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                // ignore: prefer_const_constructors
+                                builder: (context) => (ReviewPage())),
+                          );
+                        },
+                        icon: Icon(Icons.star)),
                     Text("Review"),
                   ],
                 )),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../bottom_navigation_bar/hill_details.dart';
-import '../review_page/review_page.dart';
 
 class HillsListView extends StatelessWidget {
   const HillsListView({Key? key}) : super(key: key);
@@ -64,16 +63,7 @@ class HillInfoCard extends StatelessWidget {
                 const SizedBox(height: 30),
                 Row(
                   children: [
-                    TextButton(
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                // ignore: prefer_const_constructors
-                                builder: (context) => (ReviewPage())),
-                          );
-                        },
-                        child: const Text("BOOKMARK")),
+                    TextButton(onPressed: () {}, child: const Text("BOOKMARK")),
                     TextButton(
                         onPressed: () async {
                           // launch directions to hill
