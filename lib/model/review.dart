@@ -1,7 +1,9 @@
+import 'package:flutter/material.dart';
+
 class Review {
   String hillID;
   String reviewText;
-  List<String> photos;
+  List<Image> photos;
   int rating;
   String reviewerID;
   String reviewerName;

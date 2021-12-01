@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
@@ -33,10 +34,19 @@ class FirestoreHelper {
     // fetch resulting reviews for given hill
     for (var doc in results.docs) {
       String reviewText = doc["reviewText"];
-      List<String> photos = doc["photos"];
       int rating = doc["rating"];
       String reviewerID = doc["reviewerID"];
       String reviewerName = doc["reviewerName"];
+
+      // load photos
+      List<dynamic> photoPaths = doc["photos"];
+      List<Image> photos = [];
+      for (var photoPath in photoPaths) {
+        Image? photo = await FirestoreHelper._getImageFromReference(photoPath);
+        if (photo != null) {
+          photos.add(photo);
+        }
+      }
 
       // add review to list of reviews
       Review review =
@@ -63,9 +73,18 @@ class FirestoreHelper {
     for (var doc in results.docs) {
       String hillID = doc["hill"];
       String reviewText = doc["reviewText"];
-      List<String> photos = doc["photos"];
       int rating = doc["rating"];
       String reviewerName = doc["reviewerName"];
+
+      // load photos
+      List<dynamic> photoPaths = doc["photos"];
+      List<Image> photos = [];
+      for (var photoPath in photoPaths) {
+        Image? photo = await FirestoreHelper._getImageFromReference(photoPath);
+        if (photo != null) {
+          photos.add(photo);
+        }
+      }
 
       // add review to list of reviews
       Review review =
@@ -89,7 +108,9 @@ class FirestoreHelper {
     for (var doc in results.docs) {
       String hillID = doc.id;
       String name = doc["name"];
-      String featuredPhoto = doc["featuredPhoto"];
+      String featuredPhotoPath = doc["featuredPhoto"];
+      Image featuredPhoto =
+          (await FirestoreHelper._getImageFromReference(featuredPhotoPath))!;
       String address = doc["address"];
       String information = doc["information"];
       GeoPoint geopoint = doc["geopoint"];
@@ -97,7 +118,7 @@ class FirestoreHelper {
 
       // add hill to list of hills
       Hill hill = Hill(hillID, name, featuredPhoto, address, information,
-          LatLng(geopoint.latitude, geopoint.longitude), reviews, []);
+          LatLng(geopoint.latitude, geopoint.longitude), reviews);
       hills.add(hill);
     }
     return hills;
@@ -115,14 +136,16 @@ class FirestoreHelper {
     // hill exists, save data
     var doc = result.data()!;
     String name = doc["name"];
-    String featuredPhoto = doc["featuredPhoto"];
+    String featuredPhotoPath = doc["featuredPhoto"];
+    Image featuredPhoto =
+        (await FirestoreHelper._getImageFromReference(featuredPhotoPath))!;
     String address = doc["address"];
     String information = doc["information"];
     GeoPoint geopoint = doc["geopoint"];
     List<Review> reviews = await FirestoreHelper.getReviewsForHill(hillID);
 
     return Hill(hillID, name, featuredPhoto, address, information,
-        LatLng(geopoint.latitude, geopoint.longitude), reviews, []);
+        LatLng(geopoint.latitude, geopoint.longitude), reviews);
   }
 
   static Future<List<Hill>> getBookmarksForUser(String userID) async {
@@ -202,6 +225,20 @@ class FirestoreHelper {
       "reviewerID": reviewerID,
       "reviewerName": reviewerName
     });
+  }
+
+  static Future<Image?> _getImageFromReference(String ref) async {
+    String downloadURL = "";
+
+    try {
+      downloadURL = await firebase_storage.FirebaseStorage.instance
+          .ref(ref)
+          .getDownloadURL();
+    } on FirebaseException {
+      return null;
+    }
+
+    return Image.network(downloadURL);
   }
 
   static Future<String?> _uploadReviewPhoto(
