@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:tobogganapp/hill_details.dart';
 
 class HillsListView extends StatelessWidget {
   const HillsListView({Key? key}) : super(key: key);
@@ -29,15 +30,22 @@ class HillInfoCard extends StatelessWidget {
             padding: const EdgeInsets.only(left: 15, right: 15),
             child: Column(
               children: [
-                Row(children: const [
-                  Text(
-                    "OTU Park",
-                    style: TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue,
-                    ),
-                  )
+                Row(children: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Hilldetails()));
+                      },
+                      child: const Text(
+                        "OTU Park",
+                        style: TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue,
+                        ),
+                      ))
                 ]),
                 Row(children: const [
                   Icon(Icons.star, color: Colors.amber),
