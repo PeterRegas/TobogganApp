@@ -1,8 +1,11 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '/firestore_helper.dart';
 import '/model/hill.dart';
+import 'dart:io';
 
 class ReviewPage extends StatelessWidget {
   Hill? hillObject;
@@ -29,10 +32,10 @@ class Review extends StatefulWidget {
 }
 
 class _ReviewState extends State<Review> {
-  TextEditingController _reviewTextController = TextEditingController();
+  final TextEditingController _reviewTextController = TextEditingController();
   int _rating = -1;
   String userID = FirebaseAuth.instance.currentUser!.uid;
-  ImagePicker _picker = ImagePicker();
+  ImagePicker picker = ImagePicker();
   List<XFile>? imageUrl = [];
 
   @override
@@ -126,7 +129,10 @@ class _ReviewState extends State<Review> {
             Center(
                 child: ElevatedButton(
                     onPressed: () async {
-                      imageUrl = await _picker.pickMultiImage();
+                      var images = await picker.pickMultiImage();
+                      setState(() {
+                        imageUrl = images;
+                      });
                     },
                     child: Text('Add Photo'))),
             SizedBox(
@@ -136,26 +142,9 @@ class _ReviewState extends State<Review> {
               shrinkWrap: true,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3, childAspectRatio: 1),
-              children: [
-                Container(
-                  color: Colors.grey,
-                ),
-                Container(
-                  color: Colors.grey,
-                ),
-                Container(
-                  color: Colors.grey,
-                ),
-                Container(
-                  color: Colors.grey,
-                ),
-                Container(
-                  color: Colors.grey,
-                ),
-                Container(
-                  color: Colors.grey,
-                ),
-              ],
+              children: imageUrl!.map((XFile file) {
+                return Image.file(File(file.path));
+              }).toList(),
             ),
             SizedBox(
               height: 80,
@@ -167,7 +156,7 @@ class _ReviewState extends State<Review> {
                   widget.hillObject!.hillID,
                   _reviewTextController.text,
                   imageUrl!,
-                  _rating.toString(),
+                  _rating,
                   userID,
                   await FirestoreHelper.getNameForUserId(userID),
                 );

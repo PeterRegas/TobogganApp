@@ -200,7 +200,7 @@ class FirestoreHelper {
       String hillID,
       String reviewText,
       List<XFile> photos,
-      String rating,
+      int rating,
       String reviewerID,
       String reviewerName) async {
     CollectionReference reviews =
