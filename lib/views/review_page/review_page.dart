@@ -64,7 +64,7 @@ class _ReviewState extends State<Review> {
                 SizedBox(width: 10),
                 IconButton(
                   icon: Icon(Icons.star,
-                      color: _rating >= 1 ? Colors.amber : Colors.black),
+                      color: _rating >= 1 ? Colors.amber : Colors.grey),
                   onPressed: () {
                     setState(() {
                       if (_rating == 1) {
@@ -77,7 +77,7 @@ class _ReviewState extends State<Review> {
                 ),
                 IconButton(
                   icon: Icon(Icons.star,
-                      color: _rating >= 2 ? Colors.amber : Colors.black),
+                      color: _rating >= 2 ? Colors.amber : Colors.grey),
                   onPressed: () {
                     setState(() {
                       _rating = 2;
@@ -86,7 +86,7 @@ class _ReviewState extends State<Review> {
                 ),
                 IconButton(
                   icon: Icon(Icons.star,
-                      color: _rating >= 3 ? Colors.amber : Colors.black),
+                      color: _rating >= 3 ? Colors.amber : Colors.grey),
                   onPressed: () {
                     setState(() {
                       _rating = 3;
@@ -95,7 +95,7 @@ class _ReviewState extends State<Review> {
                 ),
                 IconButton(
                   icon: Icon(Icons.star,
-                      color: _rating >= 4 ? Colors.amber : Colors.black),
+                      color: _rating >= 4 ? Colors.amber : Colors.grey),
                   onPressed: () {
                     setState(() {
                       _rating = 4;
@@ -104,7 +104,7 @@ class _ReviewState extends State<Review> {
                 ),
                 IconButton(
                   icon: Icon(Icons.star,
-                      color: _rating >= 5 ? Colors.amber : Colors.black),
+                      color: _rating >= 5 ? Colors.amber : Colors.grey),
                   onPressed: () {
                     setState(() {
                       _rating = 5;
@@ -126,15 +126,32 @@ class _ReviewState extends State<Review> {
               ),
             ),
             SizedBox(height: 10),
-            Center(
-                child: ElevatedButton(
-                    onPressed: () async {
-                      var images = await picker.pickMultiImage();
-                      setState(() {
-                        imageUrl = images;
-                      });
-                    },
-                    child: Text('Add Photo'))),
+            Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+              ElevatedButton(
+                  onPressed: () async {
+                    var images = await picker.pickMultiImage();
+                    setState(() {
+                      imageUrl = images;
+                    });
+                  },
+                  child: Text('Add Photo', style: TextStyle(fontSize: 20))),
+              ElevatedButton(
+                onPressed: () async {
+                  await FirestoreHelper.addReview(
+                    widget.hillObject!.hillID,
+                    _reviewTextController.text,
+                    imageUrl!,
+                    _rating,
+                    userID,
+                    await FirestoreHelper.getNameForUserId(userID),
+                  );
+
+                  final snackBar = SnackBar(content: Text('Review Added'));
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                },
+                child: Text('Submit Review', style: TextStyle(fontSize: 20)),
+              )
+            ]),
             SizedBox(
               height: 10,
             ),
@@ -149,23 +166,6 @@ class _ReviewState extends State<Review> {
             SizedBox(
               height: 80,
             ),
-            Center(
-                child: ElevatedButton(
-              onPressed: () async {
-                await FirestoreHelper.addReview(
-                  widget.hillObject!.hillID,
-                  _reviewTextController.text,
-                  imageUrl!,
-                  _rating,
-                  userID,
-                  await FirestoreHelper.getNameForUserId(userID),
-                );
-
-                final snackBar = SnackBar(content: Text('Review Added'));
-                ScaffoldMessenger.of(context).showSnackBar(snackBar);
-              },
-              child: Text('Add Review', style: TextStyle(fontSize: 20)),
-            )),
           ],
         )));
   }

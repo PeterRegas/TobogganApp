@@ -88,11 +88,26 @@ class HillInfoCard extends StatelessWidget {
                     ),
                   ]),
                   Row(children: [
-                    const Icon(Icons.star, color: Colors.amber),
-                    const Icon(Icons.star, color: Colors.amber),
-                    const Icon(Icons.star, color: Colors.amber),
-                    const Icon(Icons.star, color: Colors.amber),
-                    const Icon(Icons.star_half, color: Colors.amber),
+                    Icon(Icons.star,
+                        color: _hill.rating.round() >= 1
+                            ? Colors.amber
+                            : Colors.grey),
+                    Icon(Icons.star,
+                        color: _hill.rating.round() >= 2
+                            ? Colors.amber
+                            : Colors.grey),
+                    Icon(Icons.star,
+                        color: _hill.rating.round() >= 3
+                            ? Colors.amber
+                            : Colors.grey),
+                    Icon(Icons.star,
+                        color: _hill.rating.round() >= 4
+                            ? Colors.amber
+                            : Colors.grey),
+                    Icon(Icons.star,
+                        color: _hill.rating.round() >= 5
+                            ? Colors.amber
+                            : Colors.grey),
                     const SizedBox(width: 10),
                     Text("(" +
                         (_hill.reviews.length == 1

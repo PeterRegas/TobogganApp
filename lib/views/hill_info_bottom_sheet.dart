@@ -52,12 +52,17 @@ class HillInfoBottomSheet extends StatelessWidget {
 
   Widget starsForRating(double rating) {
     return Row(
-      children: const [
-        Icon(Icons.star, color: Colors.amber),
-        Icon(Icons.star, color: Colors.amber),
-        Icon(Icons.star, color: Colors.amber),
-        Icon(Icons.star_outline, color: Colors.amber),
-        Icon(Icons.star_half, color: Colors.amber)
+      children: [
+        Icon(Icons.star,
+            color: rating.round() >= 1 ? Colors.amber : Colors.grey),
+        Icon(Icons.star,
+            color: rating.round() >= 2 ? Colors.amber : Colors.grey),
+        Icon(Icons.star,
+            color: rating.round() >= 3 ? Colors.amber : Colors.grey),
+        Icon(Icons.star,
+            color: rating.round() >= 4 ? Colors.amber : Colors.grey),
+        Icon(Icons.star,
+            color: rating.round() >= 5 ? Colors.amber : Colors.grey),
       ],
     );
   }
