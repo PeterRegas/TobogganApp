@@ -43,7 +43,7 @@ class _ReviewState extends State<Review> {
           children: [
             ListTile(
               contentPadding: const EdgeInsets.all(0),
-              title: Text('OTU Park',
+              title: Text(widget.hillObject!.name,
                   style: Theme.of(context).textTheme.headline6),
               subtitle: Text(
                   widget.hillObject!.geopoint.latitude.toString() +
