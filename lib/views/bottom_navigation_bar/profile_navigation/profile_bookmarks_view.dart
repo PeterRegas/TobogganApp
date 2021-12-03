@@ -13,7 +13,14 @@ class BookmarkView extends StatefulWidget {
 class _BookmarkViewState extends State<BookmarkView> {
   var currentUser = FirebaseAuth.instance.currentUser;
   bool _loaded = false;
+  //List of user bookmarked hills, retrieved from the database using FirestoreHelper.getBookmarksForUser
   List<Hill> bookmarkList = [];
+
+  @override
+  void initState() {
+    getBookmarkList();
+    super.initState();
+  }
 
   getBookmarkList() async {
     var bookmarks = await FirestoreHelper.getBookmarksForUser(currentUser!.uid);
@@ -21,12 +28,6 @@ class _BookmarkViewState extends State<BookmarkView> {
       _loaded = true;
       bookmarkList = bookmarks;
     });
-  }
-
-  @override
-  void initState() {
-    getBookmarkList();
-    super.initState();
   }
 
   @override

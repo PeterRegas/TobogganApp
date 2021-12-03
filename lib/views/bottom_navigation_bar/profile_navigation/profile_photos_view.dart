@@ -10,6 +10,7 @@ class PhotoView extends StatefulWidget {
 }
 
 class _PhotoViewState extends State<PhotoView> {
+  bool _loaded = false;
   // List of user photos, map of hillname to image
   List<Map<String, Image>> _userPhotos = [];
 
@@ -25,12 +26,13 @@ class _PhotoViewState extends State<PhotoView> {
         FirebaseAuth.instance.currentUser!.uid);
 
     setState(() {
+      _loaded = true;
       _userPhotos = photos;
     });
   }
 
-//Plans to potentially have another widget that allows for zoomed viewing of a selected photo (if future developments allow for it)
-//"Sample Text" and placeholder photos will be replaced with actual photolinks from a database.
+//Photos are grabbed from the from the database that correspond to the user
+//
 //-Justin
   @override
   Widget build(BuildContext context) {
@@ -39,26 +41,34 @@ class _PhotoViewState extends State<PhotoView> {
         title: const Text("Photos"),
         backgroundColor: Colors.blue,
       ),
-      body: ListView.builder(
-        itemCount: _userPhotos.length,
-        itemBuilder: (BuildContext context, int index) {
-          return Container(
-            padding: const EdgeInsets.fromLTRB(7.5, 0, 7.5, 0),
-            child: Column(
-              children: [
-                Container(
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.all(5.0),
-                    child: Text(_userPhotos[index].keys.first)),
-                _userPhotos[index][_userPhotos[index].keys.first]!,
-                const Divider(
-                  thickness: 1,
-                ),
-              ],
+      body: !_loaded
+          ? const Center(child: CircularProgressIndicator())
+          : ListView.builder(
+              itemCount: _userPhotos.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Container(
+                  padding: const EdgeInsets.fromLTRB(7.5, 0, 7.5, 0),
+                  child: Column(
+                    children: [
+                      Container(
+                          alignment: Alignment.center,
+                          padding: const EdgeInsets.all(5.0),
+                          child: Text(
+                              "Photo taken from:\n ${_userPhotos[index].keys.first}",
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: Colors.grey.shade600,
+                                  fontStyle: FontStyle.italic))),
+                      _userPhotos[index][_userPhotos[index].keys.first]!,
+                      const Divider(
+                        thickness: 1,
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
-          );
-        },
-      ),
     );
   }
 }

@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tobogganapp/firestore_helper.dart';
+import 'package:tobogganapp/model/hill.dart';
 import 'package:tobogganapp/model/review.dart';
-import 'package:tobogganapp/views/bottom_navigation_bar/profile_navigation/profile_photos_view.dart';
 
 class ReviewView extends StatefulWidget {
   const ReviewView({Key? key}) : super(key: key);
@@ -11,25 +11,33 @@ class ReviewView extends StatefulWidget {
   _ReviewViewState createState() => _ReviewViewState();
 }
 
-//Updated version will use
-
 class _ReviewViewState extends State<ReviewView> {
   var currentUser = FirebaseAuth.instance.currentUser;
   bool _loaded = false;
+  //List of user reviews, retrieved from the database using FirestoreHelper.getReviewsForUser
   List<Review> reviewList = [];
-
-  getReviewList() async {
-    var reviews = await FirestoreHelper.getReviewsForUser(currentUser!.uid);
-    setState(() {
-      _loaded = true;
-      reviewList = reviews;
-    });
-  }
+  List<Hill?> hillNames = [];
 
   @override
   void initState() {
     getReviewList();
     super.initState();
+  }
+
+  getReviewList() async {
+    var reviews = await FirestoreHelper.getReviewsForUser(currentUser!.uid);
+    List<Hill?> hills = [];
+    for (int i = 0; i < reviews.length; i++) {
+      var newHill = await FirestoreHelper.getHillForHillId(reviews[i].hillID);
+      hills.add(newHill);
+    }
+
+    setState(() {
+      _loaded = true;
+      reviewList = reviews;
+      hillNames = hills;
+      print(hillNames[0]!.name);
+    });
   }
 
   @override
@@ -50,9 +58,9 @@ class _ReviewViewState extends State<ReviewView> {
                     children: [
                       reviewList[index].photos[0],
                       ListTile(
-                        title: Text(reviewList[index].hillID),
+                        title: Text(hillNames[index]!.name),
                         subtitle:
-                            Text("Rating: ${reviewList[index].rating}/5.0"),
+                            starsForRating(reviewList[index].rating.toDouble()),
                       ),
                       Container(
                         alignment: Alignment.topLeft,
@@ -65,8 +73,9 @@ class _ReviewViewState extends State<ReviewView> {
                         child: Text(
                           "Written by ${reviewList[index].reviewerName}",
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              fontStyle: FontStyle.italic, color: Colors.grey),
+                          style: TextStyle(
+                              fontStyle: FontStyle.italic,
+                              color: Colors.grey.shade600),
                         ),
                       ),
                       const Divider(
@@ -79,4 +88,16 @@ class _ReviewViewState extends State<ReviewView> {
             ),
     );
   }
+}
+
+Widget starsForRating(double rating) {
+  return Row(
+    children: [
+      Icon(Icons.star, color: rating.round() >= 1 ? Colors.amber : Colors.grey),
+      Icon(Icons.star, color: rating.round() >= 2 ? Colors.amber : Colors.grey),
+      Icon(Icons.star, color: rating.round() >= 3 ? Colors.amber : Colors.grey),
+      Icon(Icons.star, color: rating.round() >= 4 ? Colors.amber : Colors.grey),
+      Icon(Icons.star, color: rating.round() >= 5 ? Colors.amber : Colors.grey),
+    ],
+  );
 }
