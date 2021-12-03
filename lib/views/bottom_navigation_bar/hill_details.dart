@@ -130,14 +130,6 @@ class _AddEventState extends State<AddEvent> {
                 Expanded(
                     child: Column(
                   children: [
-                    IconButton(onPressed: () {}, icon: Icon(Icons.person_add)),
-                    Text("Check In"),
-                  ],
-                )),
-                VerticalDivider(),
-                Expanded(
-                    child: Column(
-                  children: [
                     IconButton(onPressed: () {}, icon: Icon(Icons.bookmark)),
                     Text("Bookmark"),
                   ],
