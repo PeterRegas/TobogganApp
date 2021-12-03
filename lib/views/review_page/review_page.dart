@@ -1,7 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import '/firestore_helper.dart';
 
 class ReviewPage extends StatelessWidget {
-  const ReviewPage({Key? key}) : super(key: key);
+  String? hillID = '';
+  ReviewPage({Key? key, this.hillID}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +19,8 @@ class ReviewPage extends StatelessWidget {
 }
 
 class Review extends StatefulWidget {
-  const Review({Key? key}) : super(key: key);
+  String? hillID = '';
+  Review({Key? key, this.hillID}) : super(key: key);
 
   @override
   _ReviewState createState() => _ReviewState();
@@ -24,6 +29,7 @@ class Review extends StatefulWidget {
 class _ReviewState extends State<Review> {
   TextEditingController _reviewTextController = TextEditingController();
   int _rating = -1;
+  String userID = FirebaseAuth.instance.currentUser!.uid;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -111,8 +117,21 @@ class _ReviewState extends State<Review> {
             SizedBox(height: 10),
             Center(
                 child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       print(_reviewTextController.text);
+                      final ImagePicker _picker = ImagePicker();
+
+                      final List<XFile>? imageUrl =
+                          await _picker.pickMultiImage();
+
+                      FirestoreHelper.addReview(
+                        widget.hillID!,
+                        _reviewTextController.text,
+                        imageUrl!,
+                        _rating.toString(),
+                        userID,
+                        await FirestoreHelper.getNameForUserId(userID),
+                      );
                     },
                     child: Text('Add Photo'))),
             SizedBox(
