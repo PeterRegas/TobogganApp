@@ -109,7 +109,8 @@ class _AddEventState extends State<AddEvent> {
                             context,
                             MaterialPageRoute(
                                 // ignore: prefer_const_constructors
-                                builder: (context) => (ReviewPage())),
+                                builder: (context) =>
+                                    (ReviewPage(hillObject: widget.hill))),
                           );
                         },
                         icon: Icon(Icons.star)),
