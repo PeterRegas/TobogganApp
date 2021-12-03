@@ -13,17 +13,20 @@ class BookmarkView extends StatefulWidget {
 
 class _BookmarkViewState extends State<BookmarkView> {
   var currentUser = FirebaseAuth.instance.currentUser;
+  bool _loaded = false;
   List<Hill> bookmarkList = [];
 
   getBookmarkList() async {
-    bookmarkList = await FirestoreHelper.getBookmarksForUser(currentUser!.uid);
+    var bookmarks = await FirestoreHelper.getBookmarksForUser(currentUser!.uid);
+    setState(() {
+      _loaded = true;
+      bookmarkList = bookmarks;
+    });
   }
 
   @override
   void initState() {
-    setState(() {
-      getBookmarkList();
-    });
+    getBookmarkList();
     super.initState();
   }
 
@@ -34,26 +37,28 @@ class _BookmarkViewState extends State<BookmarkView> {
         title: const Text("Bookmarks"),
         backgroundColor: Colors.blue,
       ),
-      body: ListView.builder(
-        itemCount: bookmarkList.length,
-        itemBuilder: (BuildContext context, int index) {
-          final userData = bookmarkList[index].name;
-          return Container(
-            padding: const EdgeInsets.fromLTRB(7.5, 0, 7.5, 0),
-            child: Column(
-              children: [
-                ListTile(
-                  title: Text(userData.toString()),
-                  onTap: () {},
-                ),
-                const Divider(
-                  thickness: 1,
-                ),
-              ],
+      body: !_loaded
+          ? const Center(child: CircularProgressIndicator())
+          : ListView.builder(
+              itemCount: bookmarkList.length,
+              itemBuilder: (BuildContext context, int index) {
+                final userData = bookmarkList[index].name;
+                return Container(
+                  padding: const EdgeInsets.fromLTRB(7.5, 0, 7.5, 0),
+                  child: Column(
+                    children: [
+                      ListTile(
+                        title: Text(userData.toString()),
+                        onTap: () {},
+                      ),
+                      const Divider(
+                        thickness: 1,
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
-          );
-        },
-      ),
     );
   }
 }
