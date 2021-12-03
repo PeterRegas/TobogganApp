@@ -6,10 +6,12 @@ import 'profile_navigation/profile_reviews_view.dart';
 
 class ProfileView extends StatefulWidget {
   final String _name;
+  final String _location;
   final int _numOfReviews;
   final int _numOfPhotos;
 
-  const ProfileView(this._name, this._numOfReviews, this._numOfPhotos,
+  const ProfileView(
+      this._name, this._location, this._numOfReviews, this._numOfPhotos,
       {Key? key})
       : super(key: key);
 
@@ -52,8 +54,8 @@ class _ProfileViewState extends State<ProfileView> {
                     Text(widget._name,
                         style: const TextStyle(
                             fontSize: 25, fontWeight: FontWeight.bold)),
-                    const Text("Oshawa, ON",
-                        style: TextStyle(color: Colors.grey))
+                    Text(widget._location,
+                        style: const TextStyle(color: Colors.grey))
                   ],
                 ))
           ],

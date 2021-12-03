@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:tobogganapp/firestore_helper.dart';
 
 import 'views/bottom_navigation_bar/hills_list_view.dart';
@@ -15,6 +17,7 @@ void main() {
 class MyApp extends StatefulWidget {
   // user properties, shown on ProfileView
   late String _name;
+  late String _location;
   late int _numOfReviews;
   late int _numOfPhotos;
 
@@ -45,12 +48,27 @@ class _MyAppState extends State<MyApp> {
       if (_loggedIn) {
         String uid = FirebaseAuth.instance.currentUser!.uid;
         String name = await FirestoreHelper.getNameForUserId(uid);
+        Position pos = await Geolocator.getLastKnownPosition() ??
+            // default to OTU if no last known position
+            Position(
+                latitude: 43.944459,
+                longitude: -78.896465,
+                heading: 0.0,
+                speed: 0.0,
+                accuracy: 0.0,
+                speedAccuracy: 0.0,
+                altitude: 0.0,
+                timestamp: DateTime.now());
+        Placemark placemark =
+            (await placemarkFromCoordinates(pos.latitude, pos.longitude))[0];
         int numOfPhotos = (await FirestoreHelper.getPhotosForUser(uid)).length;
         int numOfReviews =
             (await FirestoreHelper.getReviewsForUser(uid)).length;
 
         setState(() {
           widget._name = name;
+          widget._location =
+              "${placemark.locality}, ${placemark.administrativeArea}";
           widget._numOfPhotos = numOfPhotos;
           widget._numOfReviews = numOfReviews;
         });
@@ -107,7 +125,8 @@ class _MyAppState extends State<MyApp> {
         primarySwatch: Colors.blue,
       ),
       home: _loggedIn
-          ? MyHomePage(widget._name, widget._numOfReviews, widget._numOfPhotos)
+          ? MyHomePage(widget._name, widget._location, widget._numOfReviews,
+              widget._numOfPhotos)
           : const LoginPage(),
     );
   }
@@ -115,10 +134,12 @@ class _MyAppState extends State<MyApp> {
 
 class MyHomePage extends StatefulWidget {
   final String _name;
+  final String _location;
   final int _numOfReviews;
   final int _numOfPhotos;
 
-  const MyHomePage(this._name, this._numOfReviews, this._numOfPhotos,
+  const MyHomePage(
+      this._name, this._location, this._numOfReviews, this._numOfPhotos,
       {Key? key})
       : super(key: key);
 
@@ -135,7 +156,8 @@ class _MyHomePageState extends State<MyHomePage> {
     _navigationBarViews = [
       const HillsMapView(),
       const HillsListView(),
-      ProfileView(widget._name, widget._numOfReviews, widget._numOfPhotos),
+      ProfileView(widget._name, widget._location, widget._numOfReviews,
+          widget._numOfPhotos),
     ];
     super.initState();
   }

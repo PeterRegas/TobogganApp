@@ -1,6 +1,8 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:tobogganapp/firestore_helper.dart';
 import 'package:tobogganapp/views/create_account/create_account.dart';
 import '/main.dart';
@@ -148,12 +150,29 @@ class _LoginState extends State<Login> {
                           int numOfPhotos =
                               (await FirestoreHelper.getPhotosForUser(uid))
                                   .length;
+                          Position pos =
+                              await Geolocator.getLastKnownPosition() ??
+                                  // default to OTU if no last known position
+                                  Position(
+                                      latitude: 43.944459,
+                                      longitude: -78.896465,
+                                      heading: 0.0,
+                                      speed: 0.0,
+                                      accuracy: 0.0,
+                                      speedAccuracy: 0.0,
+                                      altitude: 0.0,
+                                      timestamp: DateTime.now());
+                          Placemark placemark = (await placemarkFromCoordinates(
+                              pos.latitude, pos.longitude))[0];
 
                           Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
                                   builder: (context) => MyHomePage(
-                                      name, numOfReviews, numOfPhotos)));
+                                      name,
+                                      "${placemark.locality}, ${placemark.administrativeArea}",
+                                      numOfReviews,
+                                      numOfPhotos)));
                         } on FirebaseAuthException catch (e) {
                           if ((e.code == 'user-not-found') ||
                               (e.code == 'wrong-password')) {
