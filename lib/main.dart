@@ -45,7 +45,7 @@ class _MyAppState extends State<MyApp> {
       if (_loggedIn) {
         String uid = FirebaseAuth.instance.currentUser!.uid;
         String name = await FirestoreHelper.getNameForUserId(uid);
-        int numOfPhotos = (await FirestoreHelper.getReviewsForUser(uid)).length;
+        int numOfPhotos = (await FirestoreHelper.getPhotosForUser(uid)).length;
         int numOfReviews =
             (await FirestoreHelper.getReviewsForUser(uid)).length;
 

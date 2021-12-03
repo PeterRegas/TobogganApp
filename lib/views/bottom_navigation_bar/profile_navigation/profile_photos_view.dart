@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tobogganapp/firestore_helper.dart';
 
@@ -9,26 +10,25 @@ class PhotoView extends StatefulWidget {
 }
 
 class _PhotoViewState extends State<PhotoView> {
-  List<String> photoList = [
-    "https://images.unsplash.com/photo-1545325343-33b85a319d90?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1470&q=80",
-    "https://images.unsplash.com/photo-1545325343-33b85a319d90?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1470&q=80",
-    "https://images.unsplash.com/photo-1545325343-33b85a319d90?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1470&q=80",
-    "https://images.unsplash.com/photo-1545325343-33b85a319d90?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1470&q=80"
-  ];
-
-/*
-getPhotoList() async {
-    bookmarkList = await FirestoreHelper.getPhotosForUser(currentUser!.uid);
-  }
+  // List of user photos, map of hillname to image
+  List<Map<String, Image>> _userPhotos = [];
 
   @override
   void initState() {
-    setState(() {
-      getPhotoList();
-    });
+    fetchUserPhotos();
     super.initState();
   }
-*/
+
+  void fetchUserPhotos() async {
+    // fetch the photos for the current user
+    var photos = await FirestoreHelper.getPhotosForUser(
+        FirebaseAuth.instance.currentUser!.uid);
+
+    setState(() {
+      _userPhotos = photos;
+    });
+  }
+
 //Plans to potentially have another widget that allows for zoomed viewing of a selected photo (if future developments allow for it)
 //"Sample Text" and placeholder photos will be replaced with actual photolinks from a database.
 //-Justin
@@ -40,7 +40,7 @@ getPhotoList() async {
         backgroundColor: Colors.blue,
       ),
       body: ListView.builder(
-        itemCount: photoList.length,
+        itemCount: _userPhotos.length,
         itemBuilder: (BuildContext context, int index) {
           return Container(
             padding: const EdgeInsets.fromLTRB(7.5, 0, 7.5, 0),
@@ -49,8 +49,8 @@ getPhotoList() async {
                 Container(
                     alignment: Alignment.center,
                     padding: const EdgeInsets.all(5.0),
-                    child: const Text("Sample Text")),
-                Image.network(photoList[index]),
+                    child: Text(_userPhotos[index].keys.first)),
+                _userPhotos[index][_userPhotos[index].keys.first]!,
                 const Divider(
                   thickness: 1,
                 ),

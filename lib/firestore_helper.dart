@@ -94,6 +94,42 @@ class FirestoreHelper {
     return reviews;
   }
 
+  static Future<List<Map<String, Image>>> getPhotosForUser(
+      String userID) async {
+    // maps of hillname, to photos
+    List<Map<String, Image>> photos = [];
+
+    var results = await FirebaseFirestore.instance
+        .collection("reviews")
+        .where("reviewerID", isEqualTo: userID)
+        .get();
+
+    if (results.size == 0) {
+      // return empty map of hills
+      print("No photos found by user $userID");
+      return photos;
+    }
+    // fetch resulting photos
+    for (var doc in results.docs) {
+      String hillID = doc["hill"];
+      // fetch the hillName
+      String hillName = (await FirebaseFirestore.instance
+          .collection("hills")
+          .doc(hillID)
+          .get())["name"];
+
+      // load photos
+      List<dynamic> photoPaths = doc["photos"];
+      for (var photoPath in photoPaths) {
+        Image? photo = await FirestoreHelper._getImageFromReference(photoPath);
+        if (photo != null) {
+          photos.add({hillName: photo});
+        }
+      }
+    }
+    return photos;
+  }
+
   static Future<List<Hill>> getAllHills() async {
     List<Hill> hills = [];
 

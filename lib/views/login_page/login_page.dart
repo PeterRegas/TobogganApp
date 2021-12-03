@@ -146,7 +146,7 @@ class _LoginState extends State<Login> {
                               (await FirestoreHelper.getReviewsForUser(uid))
                                   .length;
                           int numOfPhotos =
-                              (await FirestoreHelper.getReviewsForUser(uid))
+                              (await FirestoreHelper.getPhotosForUser(uid))
                                   .length;
 
                           Navigator.pushReplacement(
