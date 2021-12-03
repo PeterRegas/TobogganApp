@@ -2,10 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '/firestore_helper.dart';
+import '/model/hill.dart';
 
 class ReviewPage extends StatelessWidget {
-  String? hillID = '';
-  ReviewPage({Key? key, this.hillID}) : super(key: key);
+  Hill? hillObject;
+
+  ReviewPage({Key? key, this.hillObject}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -13,14 +15,14 @@ class ReviewPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Add Review'),
       ),
-      body: Review(),
+      body: Review(hillObject: hillObject),
     );
   }
 }
 
 class Review extends StatefulWidget {
-  String? hillID = '';
-  Review({Key? key, this.hillID}) : super(key: key);
+  Hill? hillObject;
+  Review({Key? key, this.hillObject}) : super(key: key);
 
   @override
   _ReviewState createState() => _ReviewState();
@@ -43,7 +45,10 @@ class _ReviewState extends State<Review> {
               contentPadding: const EdgeInsets.all(0),
               title: Text('OTU Park',
                   style: Theme.of(context).textTheme.headline6),
-              subtitle: Text('Coordinates',
+              subtitle: Text(
+                  widget.hillObject!.geopoint.latitude.toString() +
+                      ', ' +
+                      widget.hillObject!.geopoint.longitude.toString(),
                   style: Theme.of(context).textTheme.subtitle1),
             ),
             Row(
@@ -125,7 +130,7 @@ class _ReviewState extends State<Review> {
                           await _picker.pickMultiImage();
 
                       FirestoreHelper.addReview(
-                        widget.hillID!,
+                        widget.hillObject!.hillID,
                         _reviewTextController.text,
                         imageUrl!,
                         _rating.toString(),
@@ -143,22 +148,22 @@ class _ReviewState extends State<Review> {
                   crossAxisCount: 3, childAspectRatio: 1),
               children: [
                 Container(
-                  color: Colors.red,
+                  color: Colors.grey,
                 ),
                 Container(
-                  color: Colors.green,
+                  color: Colors.grey,
                 ),
                 Container(
-                  color: Colors.blue,
+                  color: Colors.grey,
                 ),
                 Container(
-                  color: Colors.yellow,
+                  color: Colors.grey,
                 ),
                 Container(
-                  color: Colors.orange,
+                  color: Colors.grey,
                 ),
                 Container(
-                  color: Colors.purple,
+                  color: Colors.grey,
                 ),
               ],
             ),
