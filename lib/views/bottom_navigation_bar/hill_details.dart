@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:tobogganapp/firestore_helper.dart';
 import 'package:tobogganapp/model/hill.dart';
 import '../review_page/review_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class Hilldetails extends StatelessWidget {
   Hill hill;
@@ -31,6 +34,11 @@ class AddEvent extends StatefulWidget {
 class _AddEventState extends State<AddEvent> {
   @override
   Widget build(BuildContext context) {
+    var isBookmarked = FirestoreHelper.isHillBookmarked(
+        FirebaseAuth.instance.currentUser!.uid, widget.hill.hillID);
+    ImagePicker picker = ImagePicker();
+    List<XFile>? imageUrl = [];
+
     return Padding(
       padding: EdgeInsets.all(5),
       child: Column(
@@ -47,8 +55,7 @@ class _AddEventState extends State<AddEvent> {
                           aspectRatio: 4 / 3,
                           child: Container(
                             padding: EdgeInsets.only(right: 5),
-                            child: Image.network(
-                                "https://images.unsplash.com/photo-1545325343-33b85a319d90?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1470&q=80"),
+                            child: widget.hill.featuredPhoto,
                           ),
                         )),
                   ])),
@@ -75,7 +82,7 @@ class _AddEventState extends State<AddEvent> {
                                             DefaultTextStyle.of(context).style,
                                         children: <TextSpan>[
                                       TextSpan(
-                                        text: "200 Simcoe St, North",
+                                        text: widget.hill.address,
                                         style: TextStyle(
                                             fontSize: 11,
                                             color:
@@ -122,7 +129,26 @@ class _AddEventState extends State<AddEvent> {
                 Expanded(
                     child: Column(
                   children: [
-                    IconButton(onPressed: () {}, icon: Icon(Icons.camera_alt)),
+                    IconButton(
+                        onPressed: () async {
+                          var images = await picker.pickMultiImage();
+                          FirestoreHelper.addReview(
+                            widget.hill.hillID,
+                            '',
+                            images!,
+                            -1,
+                            FirebaseAuth.instance.currentUser!.uid,
+                            await FirestoreHelper.getNameForUserId(
+                                FirebaseAuth.instance.currentUser!.uid),
+                          );
+                          setState(() {
+                            var snackBar =
+                                SnackBar(content: Text('Photo(s) Added!'));
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(snackBar);
+                          });
+                        },
+                        icon: Icon(Icons.camera_alt)),
                     Text("Add Photo"),
                   ],
                 )),
@@ -130,7 +156,27 @@ class _AddEventState extends State<AddEvent> {
                 Expanded(
                     child: Column(
                   children: [
-                    IconButton(onPressed: () {}, icon: Icon(Icons.bookmark)),
+                    IconButton(
+                        onPressed: () async {
+                          FirestoreHelper.toggleHillBookmarkFor(
+                              FirebaseAuth.instance.currentUser!.uid,
+                              widget.hill.hillID);
+
+                          if (await isBookmarked == true) {
+                            var snackBar =
+                                SnackBar(content: Text('Bookmark Added!'));
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(snackBar);
+                          } else {
+                            var snackBar =
+                                SnackBar(content: Text('BookMark Removed!'));
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(snackBar);
+                          }
+
+                          setState(() {});
+                        },
+                        icon: Icon(Icons.bookmark)),
                     Text("Bookmark"),
                   ],
                 )),
@@ -169,16 +215,57 @@ class _AddEventState extends State<AddEvent> {
                                       fontWeight: FontWeight.bold)),
                             ),
                             Center(
-                              child: Text('Display Tab 2',
-                                  style: TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold)),
+                              child: ListView.separated(
+                                separatorBuilder:
+                                    (BuildContext context, int index) =>
+                                        const Divider(),
+                                itemCount: widget.hill.photos.length,
+                                itemBuilder: (context, index) {
+                                  return widget.hill.photos[index];
+                                },
+                              ),
                             ),
                             Center(
-                              child: Text('Display Tab 3',
-                                  style: TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold)),
+                              child: ListView.separated(
+                                separatorBuilder:
+                                    (BuildContext context, int index) =>
+                                        const Divider(),
+                                itemCount: widget.hill.reviews.length,
+                                itemBuilder: (context, index) {
+                                  return Expanded(
+                                    child: Column(
+                                      children: [
+                                        StarDisplayUser(
+                                            review: widget
+                                                .hill.reviews[index].rating),
+                                        Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Container(
+                                            child: Text(
+                                              widget.hill.reviews[index]
+                                                  .reviewText,
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                            padding: EdgeInsets.only(top: 5)),
+                                        Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Container(
+                                            child: Text(
+                                              widget.hill.reviews[index]
+                                                  .reviewerName,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 10),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
                             ),
                           ]))
                     ])),
@@ -213,6 +300,24 @@ class StarDisplay extends StatelessWidget {
         Icon(Icons.star,
             color:
                 hillObject!.rating.round() >= 5 ? Colors.amber : Colors.grey),
+      ],
+    );
+  }
+}
+
+class StarDisplayUser extends StatelessWidget {
+  int? review;
+  StarDisplayUser({this.review});
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Icon(Icons.star, color: review! >= 1 ? Colors.amber : Colors.grey),
+        Icon(Icons.star, color: review! >= 2 ? Colors.amber : Colors.grey),
+        Icon(Icons.star, color: review! >= 3 ? Colors.amber : Colors.grey),
+        Icon(Icons.star, color: review! >= 4 ? Colors.amber : Colors.grey),
+        Icon(Icons.star, color: review! >= 5 ? Colors.amber : Colors.grey),
       ],
     );
   }
