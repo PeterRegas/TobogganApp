@@ -1,7 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../../firestore_helper.dart';
 import 'profile_navigation/profile_bookmarks_view.dart';
 import 'profile_navigation/profile_photos_view.dart';
 import 'profile_navigation/profile_reviews_view.dart';
@@ -10,10 +8,9 @@ class ProfileView extends StatefulWidget {
   final String _name;
   final int _numOfReviews;
   final int _numOfPhotos;
-  // // map of hill name, images for current user
-  // late final Map<String, List<Image>> _userPhotos;
 
-  ProfileView(this._name, this._numOfReviews, this._numOfPhotos, {Key? key})
+  const ProfileView(this._name, this._numOfReviews, this._numOfPhotos,
+      {Key? key})
       : super(key: key);
 
   @override
@@ -21,21 +18,6 @@ class ProfileView extends StatefulWidget {
 }
 
 class _ProfileViewState extends State<ProfileView> {
-  // @override
-  // void initState() {
-  //   fetchUserPhotos();
-  //   super.initState();
-  // }
-
-  // void fetchUserPhotos() async {
-  //   // fetch the photos for the current user
-  //   var photos = await FirestoreHelper.getPhotosForUser(
-  //       FirebaseAuth.instance.currentUser!.uid);
-  //   setState(() {
-  //     widget._userPhotos = photos;
-  //   });
-  // }
-
   @override
   Widget build(BuildContext context) {
     return ListView(

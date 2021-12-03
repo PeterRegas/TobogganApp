@@ -211,6 +211,50 @@ class FirestoreHelper {
     return bookmarkedHills;
   }
 
+  static Future<bool> isHillBookmarked(String userID, String hillID) async {
+    var results = await FirebaseFirestore.instance
+        .collection("user_data")
+        .doc(userID)
+        .get();
+
+    if (!results.exists) {
+      print(
+          "No user_data entry found for $userID when getting their bookmarks");
+      return false;
+    }
+    // fetch bookmarks
+    var bookmarks = results.data()!["bookmarks"];
+    for (var bookmarkedHillID in bookmarks) {
+      if (bookmarkedHillID == hillID) {
+        return true;
+      }
+    }
+
+    // not found
+    return false;
+  }
+
+  static Future<void> toggleHillBookmarkFor(
+      String userID, String hillID) async {
+    // fetch user's current bookmarks
+    var results = await FirebaseFirestore.instance
+        .collection("user_data")
+        .doc(userID)
+        .get();
+    List<dynamic> bookmarks = results.data()!["bookmarks"];
+
+    if (!bookmarks.contains(hillID)) {
+      bookmarks.add(hillID);
+    } else {
+      bookmarks.remove(hillID);
+    }
+
+    await FirebaseFirestore.instance
+        .collection("user_data")
+        .doc(userID)
+        .update({"bookmarks": bookmarks});
+  }
+
   static Future<void> addHill(String name, XFile featuredPhoto, String address,
       String information, GeoPoint geoPoint) async {
     CollectionReference hills = FirebaseFirestore.instance.collection('hills');
