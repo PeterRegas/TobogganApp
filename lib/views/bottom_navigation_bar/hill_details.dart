@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:tobogganapp/firestore_helper.dart';
+import 'package:tobogganapp/model/hill.dart';
 import '../review_page/review_page.dart';
 
 class Hilldetails extends StatelessWidget {
+  Hill hill;
+  Hilldetails(this.hill, {Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Hill Details"),
       ),
-      body: AddEvent(),
+      body: AddEvent(hill),
     );
   }
 }
@@ -17,7 +21,8 @@ class Hilldetails extends StatelessWidget {
 final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
 class AddEvent extends StatefulWidget {
-  const AddEvent({Key? key}) : super(key: key);
+  Hill hill;
+  AddEvent(this.hill, {Key? key}) : super(key: key);
 
   @override
   State<AddEvent> createState() => _AddEventState();
@@ -56,7 +61,7 @@ class _AddEventState extends State<AddEvent> {
                             alignment: Alignment.centerLeft,
                             child: Padding(
                                 child: Text(
-                                  "OTU Park",
+                                  widget.hill.name,
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                                 padding: EdgeInsets.only(left: 5))),

@@ -120,7 +120,7 @@ class _HillsMapViewState extends State<HillsMapView> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => Hilldetails()));
+                              builder: (context) => Hilldetails(hill)));
                     },
                   ),
                 );
