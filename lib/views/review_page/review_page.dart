@@ -32,6 +32,9 @@ class _ReviewState extends State<Review> {
   TextEditingController _reviewTextController = TextEditingController();
   int _rating = -1;
   String userID = FirebaseAuth.instance.currentUser!.uid;
+  ImagePicker _picker = ImagePicker();
+  List<XFile>? imageUrl = [];
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -123,20 +126,7 @@ class _ReviewState extends State<Review> {
             Center(
                 child: ElevatedButton(
                     onPressed: () async {
-                      print(_reviewTextController.text);
-                      final ImagePicker _picker = ImagePicker();
-
-                      final List<XFile>? imageUrl =
-                          await _picker.pickMultiImage();
-
-                      FirestoreHelper.addReview(
-                        widget.hillObject!.hillID,
-                        _reviewTextController.text,
-                        imageUrl!,
-                        _rating.toString(),
-                        userID,
-                        await FirestoreHelper.getNameForUserId(userID),
-                      );
+                      imageUrl = await _picker.pickMultiImage();
                     },
                     child: Text('Add Photo'))),
             SizedBox(
@@ -172,8 +162,18 @@ class _ReviewState extends State<Review> {
             ),
             Center(
                 child: ElevatedButton(
-              onPressed: () {
-                print(_reviewTextController.text);
+              onPressed: () async {
+                await FirestoreHelper.addReview(
+                  widget.hillObject!.hillID,
+                  _reviewTextController.text,
+                  imageUrl!,
+                  _rating.toString(),
+                  userID,
+                  await FirestoreHelper.getNameForUserId(userID),
+                );
+
+                final snackBar = SnackBar(content: Text('Review Added'));
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
               },
               child: Text('Add Review', style: TextStyle(fontSize: 20)),
             )),
