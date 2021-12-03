@@ -1,4 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:tobogganapp/firestore_helper.dart';
+import 'package:tobogganapp/model/review.dart';
+import 'package:tobogganapp/views/bottom_navigation_bar/profile_navigation/profile_photos_view.dart';
 
 class ReviewView extends StatefulWidget {
   const ReviewView({Key? key}) : super(key: key);
@@ -7,24 +11,23 @@ class ReviewView extends StatefulWidget {
   _ReviewViewState createState() => _ReviewViewState();
 }
 
-class Review {
-  String text;
-  double rating;
-  String location;
-
-  Review(this.text, this.rating, this.location);
-}
-
 //Updated version will use
 
 class _ReviewViewState extends State<ReviewView> {
-  List<Review> testList = [
-    Review("The fitnessgram pacer test is a multistage aerobic capacity test",
-        10.0, "Gym"),
-    Review("Someone stole my pants, 0/10", 0, "Grand Canyon"),
-    Review("I had a great time! Would come again!", 9.0, "OnTech U"),
-    Review("I'm lost please help me", 5.0, "????"),
-  ];
+  var currentUser = FirebaseAuth.instance.currentUser;
+  List<Review> reviewList = [];
+
+  getReviewList() async {
+    reviewList = await FirestoreHelper.getReviewsForUser(currentUser!.uid);
+  }
+
+  @override
+  void initState() {
+    setState(() {
+      getReviewList();
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,20 +37,31 @@ class _ReviewViewState extends State<ReviewView> {
         backgroundColor: Colors.blue,
       ),
       body: ListView.builder(
-        itemCount: testList.length,
+        itemCount: reviewList.length,
         itemBuilder: (BuildContext context, int index) {
           return Container(
             padding: const EdgeInsets.fromLTRB(7.5, 0, 7.5, 0),
             child: Column(
               children: [
+                reviewList[index].photos[0],
                 ListTile(
-                  title: Text(testList[index].location),
-                  subtitle: Text("Rating: ${testList[index].rating}/10.0"),
+                  title: Text(reviewList[index].hillID),
+                  subtitle: Text("Rating: ${reviewList[index].rating}/5.0"),
                 ),
                 Container(
                   alignment: Alignment.topLeft,
                   padding: EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
-                  child: Text(testList[index].text),
+                  child: Text(reviewList[index].reviewText),
+                ),
+                Container(
+                  alignment: Alignment.topLeft,
+                  padding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0),
+                  child: Text(
+                    "Written by ${reviewList[index].reviewerName}",
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontStyle: FontStyle.italic, color: Colors.grey),
+                  ),
                 ),
                 const Divider(
                   thickness: 1,
