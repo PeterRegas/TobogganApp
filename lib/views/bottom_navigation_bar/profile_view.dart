@@ -61,7 +61,10 @@ class _ProfileViewState extends State<ProfileView> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Text("${widget._numOfReviews} reviews",
+            Text(
+                widget._numOfReviews == 1
+                    ? "${widget._numOfReviews} review"
+                    : "${widget._numOfReviews} reviews",
                 style: const TextStyle(fontSize: 16)),
             SizedBox(
                 child: Container(
@@ -69,7 +72,10 @@ class _ProfileViewState extends State<ProfileView> {
                   alignment: Alignment.center,
                 ),
                 width: 20),
-            Text("${widget._numOfPhotos} photos",
+            Text(
+                widget._numOfPhotos == 1
+                    ? "${widget._numOfPhotos} photo"
+                    : "${widget._numOfPhotos} photos",
                 style: const TextStyle(fontSize: 16))
           ],
         ),
