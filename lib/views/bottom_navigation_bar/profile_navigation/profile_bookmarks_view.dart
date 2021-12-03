@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tobogganapp/firestore_helper.dart';
@@ -42,13 +41,14 @@ class _BookmarkViewState extends State<BookmarkView> {
           : ListView.builder(
               itemCount: bookmarkList.length,
               itemBuilder: (BuildContext context, int index) {
-                final userData = bookmarkList[index].name;
                 return Container(
                   padding: const EdgeInsets.fromLTRB(7.5, 0, 7.5, 0),
                   child: Column(
                     children: [
                       ListTile(
-                        title: Text(userData.toString()),
+                        title: Text(bookmarkList[index].name.toString()),
+                        subtitle:
+                            Text(bookmarkList[index].information.toString()),
                         onTap: () {},
                       ),
                       const Divider(
