@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:tobogganapp/firestore_helper.dart';
+import 'package:tobogganapp/model/non_review_photo.dart';
 import 'package:tobogganapp/model/review.dart';
 
 class Hill {
@@ -22,11 +24,17 @@ class Hill {
     return sum / reviews.length;
   }
 
-  List<Image> get photos {
+  Future<List<Image>> get photos async {
     List<Image> photos = [];
-    // fetches allthe photos from all reviews
+    // fetches all the photos from all reviews
     for (Review review in reviews) {
       photos.addAll(review.photos);
+    }
+    // fetch all the non-review photos
+    var nonReviewPhotos =
+        await FirestoreHelper.getNonReviewPhotosForHill(hillID);
+    for (NonReviewPhoto nonReviewPhoto in nonReviewPhotos) {
+      photos.addAll(nonReviewPhoto.photos);
     }
     return photos;
   }

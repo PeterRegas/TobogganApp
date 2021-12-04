@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:tobogganapp/model/non_review_photo.dart';
 
 import 'model/hill.dart';
 import 'model/review.dart';
@@ -94,6 +95,102 @@ class FirestoreHelper {
     return reviews;
   }
 
+  static Future<List<NonReviewPhoto>> getNonReviewPhotosForHill(
+      String hillID) async {
+    List<NonReviewPhoto> images = [];
+
+    var results = await FirebaseFirestore.instance
+        .collection("non_review_photos")
+        .where("hill", isEqualTo: hillID)
+        .get();
+
+    if (results.size == 0) {
+      // return empty list of photos
+      print("No non-review photos found for hill $hillID");
+      return images;
+    }
+    // fetch resulting photos for given hill
+    for (var doc in results.docs) {
+      String user = doc["user"];
+      String userID = doc["userID"];
+
+      // load photos
+      List<dynamic> photoPaths = doc["photos"];
+      List<Image> photos = [];
+      for (var photoPath in photoPaths) {
+        Image? photo = await FirestoreHelper._getImageFromReference(photoPath);
+        if (photo != null) {
+          photos.add(photo);
+        }
+      }
+
+      // add photo
+      NonReviewPhoto photo = NonReviewPhoto(hillID, userID, user, photos);
+      images.add(photo);
+    }
+    return images;
+  }
+
+  static Future<List<NonReviewPhoto>> getNonReviewPhotosForUserId(
+      String userID) async {
+    List<NonReviewPhoto> images = [];
+
+    var results = await FirebaseFirestore.instance
+        .collection("non_review_photos")
+        .where("userID", isEqualTo: userID)
+        .get();
+
+    if (results.size == 0) {
+      // return empty list of photos
+      print("No non-review photos found for user $userID");
+      return images;
+    }
+    // fetch resulting photos for given user
+    for (var doc in results.docs) {
+      String user = doc["user"];
+      String hillID = doc["hill"];
+
+      // load photos
+      List<dynamic> photoPaths = doc["photos"];
+      List<Image> photos = [];
+      for (var photoPath in photoPaths) {
+        Image? photo = await FirestoreHelper._getImageFromReference(photoPath);
+        if (photo != null) {
+          photos.add(photo);
+        }
+      }
+
+      // add photo
+      NonReviewPhoto photo = NonReviewPhoto(hillID, userID, user, photos);
+      images.add(photo);
+    }
+    return images;
+  }
+
+  static Future<void> addNonReviewPhoto(
+      String hillID, String userID, String user, List<XFile> photos) async {
+    CollectionReference nonReviewPhotos =
+        FirebaseFirestore.instance.collection('non_review_photos');
+
+    // upload non-review photos
+    List<String> photoPaths = [];
+    for (var photo in photos) {
+      var photoPath =
+          await FirestoreHelper._uploadNonReviewPhoto(photo, hillID, userID);
+      // if upload was successful, save path in non-review photos
+      if (photoPath != null) {
+        photoPaths.add(photoPath);
+      }
+    }
+
+    await nonReviewPhotos.add({
+      "hill": hillID,
+      "photos": photoPaths,
+      "user": user,
+      "userID": userID,
+    });
+  }
+
   static Future<List<Map<String, Image>>> getPhotosForUser(
       String userID) async {
     // maps of hillname, to photos
@@ -104,13 +201,32 @@ class FirestoreHelper {
         .where("reviewerID", isEqualTo: userID)
         .get();
 
-    if (results.size == 0) {
-      // return empty map of hills
-      print("No photos found by user $userID");
-      return photos;
-    }
-    // fetch resulting photos
+    var nonReviewResults = await FirebaseFirestore.instance
+        .collection("non_review_photos")
+        .where("userID", isEqualTo: userID)
+        .get();
+
+    // fetch resulting photos from reviews
     for (var doc in results.docs) {
+      String hillID = doc["hill"];
+      // fetch the hillName
+      String hillName = (await FirebaseFirestore.instance
+          .collection("hills")
+          .doc(hillID)
+          .get())["name"];
+
+      // load photos
+      List<dynamic> photoPaths = doc["photos"];
+      for (var photoPath in photoPaths) {
+        Image? photo = await FirestoreHelper._getImageFromReference(photoPath);
+        if (photo != null) {
+          photos.add({hillName: photo});
+        }
+      }
+    }
+
+    // fetch resulting photos from non-reviews
+    for (var doc in nonReviewResults.docs) {
       String hillID = doc["hill"];
       // fetch the hillName
       String hillName = (await FirebaseFirestore.instance
@@ -336,6 +452,25 @@ class FirestoreHelper {
     } on FirebaseException catch (e) {
       // return null if there was an error trying to upload file
       print("Error trying to upload review photo $photoName");
+      return null;
+    }
+  }
+
+  static Future<String?> _uploadNonReviewPhoto(
+      XFile photo, String hillID, String userID) async {
+    File file = File(photo.path);
+
+    String photoName =
+        "$hillID-$userID-${DateTime.now().millisecondsSinceEpoch}";
+
+    try {
+      await firebase_storage.FirebaseStorage.instance
+          .ref('non_review_photos/$photoName.png')
+          .putFile(file);
+      return "non_review_photos/$photoName.png";
+    } on FirebaseException catch (e) {
+      // return null if there was an error trying to upload file
+      print("Error trying to upload non_review photo $photoName");
       return null;
     }
   }

@@ -25,6 +25,7 @@ final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
 class AddEvent extends StatefulWidget {
   Hill hill;
+  List<Image> photos = [];
   AddEvent(this.hill, {Key? key}) : super(key: key);
 
   @override
@@ -32,6 +33,19 @@ class AddEvent extends StatefulWidget {
 }
 
 class _AddEventState extends State<AddEvent> {
+  @override
+  initState() {
+    loadPhotos();
+    super.initState();
+  }
+
+  loadPhotos() async {
+    var photos = await widget.hill.photos;
+    setState(() {
+      widget.photos = photos;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var isBookmarked = FirestoreHelper.isHillBookmarked(
@@ -132,15 +146,13 @@ class _AddEventState extends State<AddEvent> {
                     IconButton(
                         onPressed: () async {
                           var images = await picker.pickMultiImage();
-                          FirestoreHelper.addReview(
-                            widget.hill.hillID,
-                            '',
-                            images!,
-                            -1,
-                            FirebaseAuth.instance.currentUser!.uid,
-                            await FirestoreHelper.getNameForUserId(
-                                FirebaseAuth.instance.currentUser!.uid),
-                          );
+                          String userID =
+                              FirebaseAuth.instance.currentUser!.uid;
+                          FirestoreHelper.addNonReviewPhoto(
+                              widget.hill.hillID,
+                              userID,
+                              await FirestoreHelper.getNameForUserId(userID),
+                              images!);
                           setState(() {
                             var snackBar =
                                 SnackBar(content: Text('Photo(s) Added!'));
@@ -215,16 +227,30 @@ class _AddEventState extends State<AddEvent> {
                                       fontWeight: FontWeight.bold)),
                             ),
                             Center(
-                              child: ListView.separated(
-                                separatorBuilder:
-                                    (BuildContext context, int index) =>
-                                        const Divider(),
-                                itemCount: widget.hill.photos.length,
-                                itemBuilder: (context, index) {
-                                  return widget.hill.photos[index];
-                                },
-                              ),
-                            ),
+                                child: GridView.builder(
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 3),
+                              itemCount: widget.photos.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return GestureDetector(
+                                  child: widget.photos[index],
+                                  onTap: () {
+                                    // navigate to photo detail
+                                  },
+                                );
+                              },
+                            )
+                                // child: ListView.separated(
+                                //   separatorBuilder:
+                                //       (BuildContext context, int index) =>
+                                //           const Divider(),
+                                //   itemCount: widget.hill.photos.length,
+                                //   itemBuilder: (context, index) {
+                                //     return widget.hill.photos[index];
+                                //   },
+                                // ),
+                                ),
                             Center(
                               child: ListView.separated(
                                 separatorBuilder:
