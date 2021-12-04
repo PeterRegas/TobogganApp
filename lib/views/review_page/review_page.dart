@@ -3,6 +3,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:tobogganapp/views/bottom_navigation_bar/hill_details.dart';
 import '/firestore_helper.dart';
 import '/model/hill.dart';
 import 'dart:io';
@@ -148,6 +149,18 @@ class _ReviewState extends State<Review> {
 
                   final snackBar = SnackBar(content: Text('Review Added'));
                   ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  // pop current review page and show
+                  var hillWithUpdatedDetails =
+                      (await FirestoreHelper.getHillForHillId(
+                          widget.hillObject!.hillID))!;
+                  // pop to hill page
+                  Navigator.of(context).pop();
+                  // pop to map (or list) page
+                  Navigator.of(context).pop();
+                  // show hill detail again
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return Hilldetails(hillWithUpdatedDetails);
+                  }));
                 },
                 child: Text('Submit Review', style: TextStyle(fontSize: 20)),
               )

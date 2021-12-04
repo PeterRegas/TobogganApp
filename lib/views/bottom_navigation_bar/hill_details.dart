@@ -159,6 +159,17 @@ class _AddEventState extends State<AddEvent> {
                             ScaffoldMessenger.of(context)
                                 .showSnackBar(snackBar);
                           });
+                          // pop current review page and show
+                          var hillWithUpdatedDetails =
+                              (await FirestoreHelper.getHillForHillId(
+                                  widget.hill.hillID))!;
+                          // pop away hill page
+                          Navigator.of(context).pop();
+                          // show hill detail again
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) {
+                            return Hilldetails(hillWithUpdatedDetails);
+                          }));
                         },
                         icon: Icon(Icons.camera_alt)),
                     Text("Add Photo"),
