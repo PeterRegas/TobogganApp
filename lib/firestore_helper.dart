@@ -6,9 +6,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:tobogganapp/model/non_review_photo.dart';
-
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'model/hill.dart';
 import 'model/review.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 class FirestoreHelper {
   static Future<String> getNameForUserId(String userID) async {
@@ -491,5 +493,54 @@ class FirestoreHelper {
       print("Error trying to upload featured photo for hill $hillID");
       return null;
     }
+  }
+}
+
+class SimpleNotification {
+  BuildContext context;
+  late FlutterLocalNotificationsPlugin notification;
+
+  SimpleNotification(this.context) {
+    initNotification();
+    tz.initializeTimeZones();
+  }
+
+  //initialize notification
+  initNotification() {
+    notification = FlutterLocalNotificationsPlugin();
+    AndroidInitializationSettings androidInitializationSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    InitializationSettings initializationSettings = InitializationSettings(
+        android: androidInitializationSettings, iOS: null);
+
+    notification.initialize(initializationSettings,
+        onSelectNotification: selectNotification);
+  }
+
+  Future<String?> selectNotification(String? payload) async {
+    await showDialog(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+              title: Text("Notification Clicked"),
+              content: Text("You clicked the notification."),
+            ));
+  }
+
+  Future showScheduledNotification(title, body) async {
+    var android = AndroidNotificationDetails(
+        "channelId", "channelName", "This is a simple notification",
+        priority: Priority.high, importance: Importance.max);
+    var platformDetails = NotificationDetails(android: android);
+    await notification.zonedSchedule(
+        101,
+        title,
+        body,
+        tz.TZDateTime.from(DateTime.now(), tz.local)
+            .add(const Duration(minutes: 30)),
+        platformDetails,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        androidAllowWhileIdle: true);
   }
 }

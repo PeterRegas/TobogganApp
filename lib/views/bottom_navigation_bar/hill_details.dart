@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:tobogganapp/firestore_helper.dart';
 import 'package:tobogganapp/model/hill.dart';
 import '../review_page/review_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
+import 'package:weather/weather.dart';
+import 'hills_map_view.dart';
+import 'package:latlong2/latlong.dart';
 
 class Hilldetails extends StatelessWidget {
   Hill hill;
@@ -50,6 +53,8 @@ class _AddEventState extends State<AddEvent> {
   Widget build(BuildContext context) {
     ImagePicker picker = ImagePicker();
     List<XFile>? imageUrl = [];
+    double lat = widget.hill.geopoint.latitude;
+    double lng = widget.hill.geopoint.longitude;
 
     return Padding(
       padding: EdgeInsets.all(5),
@@ -232,10 +237,73 @@ class _AddEventState extends State<AddEvent> {
                                       color: Colors.grey, width: 0.5))),
                           child: TabBarView(children: <Widget>[
                             Center(
-                              child: Text('Display Tab 1',
-                                  style: TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold)),
+                              child: ListView(
+                                children: [
+                                  TextButton(
+                                      onPressed: () async {
+                                        WeatherFactory wf = WeatherFactory(
+                                            "1945f5fb63d8b8c849f434e5e47277b6");
+                                        Weather w =
+                                            await wf.currentWeatherByLocation(
+                                                widget.hill.geopoint.latitude,
+                                                widget.hill.geopoint.longitude);
+                                        double? celsius =
+                                            w.temperature!.celsius;
+                                        setState(() {
+                                          var snackBar = SnackBar(
+                                              content: Text(
+                                                  'Current temperature at hill is: ' +
+                                                      celsius!
+                                                          .round()
+                                                          .toString() +
+                                                      "°C"));
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(snackBar);
+                                        });
+                                      },
+                                      child: Column(children: [
+                                        Icon(Icons.wb_sunny),
+                                        Text("Press For Current Temperature")
+                                      ])),
+                                  TextButton(
+                                      onPressed: () {
+                                        var name = widget.hill.name;
+                                        SimpleNotification(context)
+                                            .showScheduledNotification(
+                                                "Reminder to go Tobogganing",
+                                                "Get ready $name is waiting!");
+                                      },
+                                      child: Column(children: [
+                                        Icon(Icons.notification_add),
+                                        Text(
+                                            "Press to be reminded to go to the hill")
+                                      ])),
+                                  Container(
+                                    height: MediaQuery.of(context).size.height /
+                                        2.74,
+                                    child: FlutterMap(
+                                      options: MapOptions(
+                                        center: LatLng(lat, lng),
+                                        zoom: 16.0,
+                                      ),
+                                      layers: [
+                                        TileLayerOptions(
+                                          urlTemplate:
+                                              "https://api.mapbox.com/styles/v1/tayloryoung/ckw2deumz3jo614rtffqghrre/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoidGF5bG9yeW91bmciLCJhIjoiY2t3MjU0eWN4MGE5YjMxcHhsMjRpd3A0OSJ9.7UmX8FwS_dQQXNd5lgKQIA",
+                                        ),
+                                        MarkerLayerOptions(markers: [
+                                          Marker(
+                                            point: LatLng(lat, lng),
+                                            builder: (BuildContext context) {
+                                              return Icon(Icons.sledding);
+                                            },
+                                          ),
+                                        ]),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                             Center(
                                 child: GridView.builder(
@@ -251,17 +319,7 @@ class _AddEventState extends State<AddEvent> {
                                   },
                                 );
                               },
-                            )
-                                // child: ListView.separated(
-                                //   separatorBuilder:
-                                //       (BuildContext context, int index) =>
-                                //           const Divider(),
-                                //   itemCount: widget.hill.photos.length,
-                                //   itemBuilder: (context, index) {
-                                //     return widget.hill.photos[index];
-                                //   },
-                                // ),
-                                ),
+                            )),
                             Center(
                               child: ListView.separated(
                                 separatorBuilder:
@@ -278,9 +336,12 @@ class _AddEventState extends State<AddEvent> {
                                         Align(
                                           alignment: Alignment.centerLeft,
                                           child: Container(
-                                            child: Text(
-                                              widget.hill.reviews[index]
-                                                  .reviewText,
+                                            child: Padding(
+                                              padding: EdgeInsets.only(left: 5),
+                                              child: Text(
+                                                widget.hill.reviews[index]
+                                                    .reviewText,
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -289,12 +350,15 @@ class _AddEventState extends State<AddEvent> {
                                         Align(
                                           alignment: Alignment.centerLeft,
                                           child: Container(
-                                            child: Text(
-                                              widget.hill.reviews[index]
-                                                  .reviewerName,
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 10),
+                                            child: Padding(
+                                              padding: EdgeInsets.only(left: 5),
+                                              child: Text(
+                                                widget.hill.reviews[index]
+                                                    .reviewerName,
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 10),
+                                              ),
                                             ),
                                           ),
                                         ),
