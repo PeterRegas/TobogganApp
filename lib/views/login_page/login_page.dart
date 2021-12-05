@@ -14,10 +14,10 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text('Login'),
-        automaticallyImplyLeading: false,
-      ),
+      // appBar: AppBar(
+      //   title: Text('Login'),
+      //   automaticallyImplyLeading: false,
+      // ),
       body: Login(),
     );
   }
@@ -42,7 +42,7 @@ class _LoginState extends State<Login> {
     return Form(
         key: _formKey,
         child: Container(
-          padding: EdgeInsets.only(left: 20, right: 20, top: 5),
+          padding: EdgeInsets.only(left: 20, right: 20, top: 60),
 
           // width: MediaQuery.of(context).size.width,
           child: SingleChildScrollView(

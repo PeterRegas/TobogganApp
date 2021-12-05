@@ -12,11 +12,8 @@ class CreateAccountPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Create Account'),
-        automaticallyImplyLeading: false,
-      ),
       body: CreateAccount(),
+      backgroundColor: Colors.white,
     );
   }
 }
@@ -43,17 +40,26 @@ class _CreateAccountState extends State<CreateAccount> {
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: Container(
-              padding: EdgeInsets.only(left: 20, right: 20, top: 20),
+              padding:
+                  EdgeInsets.only(left: 20, right: 20, top: 35, bottom: 20),
 
               // width: MediaQuery.of(context).size.width,
               child:
                   Column(mainAxisAlignment: MainAxisAlignment.start, children: <
                       Widget>[
-                // Text("TobogganApp",
-                //     style: TextStyle(fontSize: 50, fontFamily: 'Lucida')),
-                // SizedBox(
-                //   height: 10,
-                // ),
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.55,
+                  height: MediaQuery.of(context).size.height * 0.15,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      fit: BoxFit.fill,
+                      image: AssetImage('images/logo.png'),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 15,
+                ),
                 TextFormField(
                   decoration: InputDecoration(
                     prefixIcon: Icon(Icons.mail_outline),
