@@ -37,7 +37,7 @@ class _ReviewState extends State<Review> {
   int _rating = -1;
   String userID = FirebaseAuth.instance.currentUser!.uid;
   ImagePicker picker = ImagePicker();
-  List<XFile>? imageUrl = [];
+  List<XFile> imageUrl = [];
 
   @override
   Widget build(BuildContext context) {
@@ -130,18 +130,30 @@ class _ReviewState extends State<Review> {
             Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
               ElevatedButton(
                   onPressed: () async {
-                    var images = await picker.pickMultiImage();
-                    setState(() {
-                      imageUrl = images;
-                    });
+                    if (imageUrl.isEmpty) {
+                      var images = await picker.pickMultiImage();
+                      setState(() {
+                        // empty list if user opened picker but never selected any images
+                        imageUrl = images ?? [];
+                      });
+                    } else {
+                      // remove photos if user wanted to
+                      bool removePhotos = await _showRemovePhotosDialog();
+                      if (removePhotos) {
+                        setState(() {
+                          imageUrl = [];
+                        });
+                      }
+                    }
                   },
-                  child: Text('Add Photo', style: TextStyle(fontSize: 20))),
+                  child: Text(imageUrl.isEmpty ? 'Add Photos' : "Remove Photos",
+                      style: TextStyle(fontSize: 20))),
               ElevatedButton(
                 onPressed: () async {
                   await FirestoreHelper.addReview(
                     widget.hillObject!.hillID,
                     _reviewTextController.text,
-                    imageUrl!,
+                    imageUrl,
                     _rating,
                     userID,
                     await FirestoreHelper.getNameForUserId(userID),
@@ -172,7 +184,7 @@ class _ReviewState extends State<Review> {
               shrinkWrap: true,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3, childAspectRatio: 1),
-              children: imageUrl!.map((XFile file) {
+              children: imageUrl.map((XFile file) {
                 return Image.file(File(file.path));
               }).toList(),
             ),
@@ -181,5 +193,44 @@ class _ReviewState extends State<Review> {
             ),
           ],
         )));
+  }
+
+  Future<bool> _showRemovePhotosDialog() async {
+    bool removePhotos = false;
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Remove added photos?'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Text(
+                    'Would you like to remove all photos added to this review?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Remove photos'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                removePhotos = true;
+              },
+            ),
+            TextButton(
+              child: const Text('No, keep photos'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                removePhotos = false;
+              },
+            ),
+          ],
+        );
+      },
+    );
+    // whether user wants to remove photos
+    return removePhotos;
   }
 }
