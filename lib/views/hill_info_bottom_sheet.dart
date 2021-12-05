@@ -11,6 +11,7 @@ class HillInfoBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(hill.rating);
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Container(
