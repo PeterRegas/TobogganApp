@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:tobogganapp/firestore_helper.dart';
+import 'package:tobogganapp/views/add_hill_page/add_hill.dart';
 
 import 'views/bottom_navigation_bar/hills_list_view.dart';
 import 'views/bottom_navigation_bar/hills_map_view.dart';
@@ -167,7 +168,12 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(title: const Text('TobogganApp'), actions: [
         _currentIndex < 2
-            ? IconButton(onPressed: () {}, icon: const Icon(Icons.add))
+            ? IconButton(
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const add_hill()));
+                },
+                icon: const Icon(Icons.add))
             : TextButton(
                 onPressed: () async {
                   if (Navigator.of(context).canPop()) {
