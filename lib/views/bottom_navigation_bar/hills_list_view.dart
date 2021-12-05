@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
@@ -55,7 +56,7 @@ class _HillsListViewState extends State<HillsListView> {
   }
 }
 
-class HillInfoCard extends StatelessWidget {
+class HillInfoCard extends StatefulWidget {
   final Hill _hill;
   final LatLng _userLocation;
 
@@ -63,23 +64,68 @@ class HillInfoCard extends StatelessWidget {
       : super(key: key);
 
   @override
+  State<HillInfoCard> createState() => _HillInfoCardState();
+}
+
+class _HillInfoCardState extends State<HillInfoCard> {
+  bool isBookmarked = false;
+
+  @override
+  void initState() {
+    determineBookmarked();
+    super.initState();
+  }
+
+  determineBookmarked() async {
+    bool bookmarked = await FirestoreHelper.isHillBookmarked(
+        FirebaseAuth.instance.currentUser!.uid, widget._hill.hillID);
+    setState(() {
+      isBookmarked = bookmarked;
+    });
+  }
+
+  toggleBookmark() async {
+    // toggle bookmark
+    await FirestoreHelper.toggleHillBookmarkFor(
+        FirebaseAuth.instance.currentUser!.uid, widget._hill.hillID);
+
+    // present relevant message if depending on whether hill is now bookmarked
+    bool bookmarked = await FirestoreHelper.isHillBookmarked(
+        FirebaseAuth.instance.currentUser!.uid, widget._hill.hillID);
+    String message;
+    if (bookmarked) {
+      message = "Bookmark added!";
+    } else {
+      message = "Bookmark removed";
+    }
+
+    // show snackbar
+    SnackBar snackbar = SnackBar(content: Text(message));
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+
+    setState(() {
+      isBookmarked = bookmarked;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         Navigator.push(context,
-            MaterialPageRoute(builder: (context) => Hilldetails(_hill)));
+            MaterialPageRoute(builder: (context) => Hilldetails(widget._hill)));
       },
       child: Card(
         child: Column(
           children: [
-            _hill.featuredPhoto,
+            widget._hill.featuredPhoto,
             Padding(
               padding: const EdgeInsets.only(left: 15, right: 15),
               child: Column(
                 children: [
                   Row(children: [
                     Text(
-                      _hill.name,
+                      widget._hill.name,
                       style: const TextStyle(
                         fontSize: 25,
                         fontWeight: FontWeight.bold,
@@ -89,48 +135,52 @@ class HillInfoCard extends StatelessWidget {
                   ]),
                   Row(children: [
                     Icon(Icons.star,
-                        color: _hill.rating.round() >= 1
+                        color: widget._hill.rating.round() >= 1
                             ? Colors.amber
                             : Colors.grey),
                     Icon(Icons.star,
-                        color: _hill.rating.round() >= 2
+                        color: widget._hill.rating.round() >= 2
                             ? Colors.amber
                             : Colors.grey),
                     Icon(Icons.star,
-                        color: _hill.rating.round() >= 3
+                        color: widget._hill.rating.round() >= 3
                             ? Colors.amber
                             : Colors.grey),
                     Icon(Icons.star,
-                        color: _hill.rating.round() >= 4
+                        color: widget._hill.rating.round() >= 4
                             ? Colors.amber
                             : Colors.grey),
                     Icon(Icons.star,
-                        color: _hill.rating.round() >= 5
+                        color: widget._hill.rating.round() >= 5
                             ? Colors.amber
                             : Colors.grey),
                     const SizedBox(width: 10),
                     Text("(" +
-                        (_hill.reviews.length == 1
-                            ? "${_hill.reviews.length} review"
-                            : "${_hill.reviews.length} reviews") +
+                        (widget._hill.reviews.length == 1
+                            ? "${widget._hill.reviews.length} review"
+                            : "${widget._hill.reviews.length} reviews") +
                         ")")
                   ]),
                   Row(children: [
                     Text(
-                        "${_hill.address} ⋅ ${_hill.distanceFrom(_userLocation)}km",
+                        "${widget._hill.address} ⋅ ${widget._hill.distanceFrom(widget._userLocation)}km",
                         style: const TextStyle(color: Colors.grey)),
                   ]),
                   const SizedBox(height: 30),
                   Row(
                     children: [
                       TextButton(
-                          onPressed: () {}, child: const Text("BOOKMARK")),
+                          onPressed: () {
+                            toggleBookmark();
+                          },
+                          child: Text(
+                              isBookmarked ? "REMOVE BOOKMARK" : "BOOKMARK")),
                       TextButton(
                           onPressed: () async {
                             // launch directions to hill
                             var pos = await Geolocator.getCurrentPosition();
                             String url =
-                                "https://www.google.com/maps/dir/?api=1&origin=${pos.latitude},${pos.longitude}&destination=${_hill.address}}";
+                                "https://www.google.com/maps/dir/?api=1&origin=${pos.latitude},${pos.longitude}&destination=${widget._hill.address}}";
                             await launch(Uri.encodeFull(url));
                           },
                           child: const Text("DIRECTIONS"))
