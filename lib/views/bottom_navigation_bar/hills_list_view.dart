@@ -128,8 +128,9 @@ class HillInfoCard extends StatelessWidget {
                       TextButton(
                           onPressed: () async {
                             // launch directions to hill
+                            var pos = await Geolocator.getCurrentPosition();
                             String url =
-                                "https://www.google.com/maps/dir/?api=1&destination=${_hill.address}}";
+                                "https://www.google.com/maps/dir/?api=1&origin=${pos.latitude},${pos.longitude}&destination=${_hill.address}}";
                             await launch(Uri.encodeFull(url));
                           },
                           child: const Text("DIRECTIONS"))

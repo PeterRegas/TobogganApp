@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:tobogganapp/firestore_helper.dart';
 import 'package:tobogganapp/model/hill.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../review_page/review_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
@@ -47,6 +49,13 @@ class _AddEventState extends State<AddEvent> {
     setState(() {
       widget.photos = photos;
     });
+  }
+
+  getDirections() async {
+    var pos = await Geolocator.getCurrentPosition();
+    String url =
+        "https://www.google.com/maps/dir/?api=1&origin=${pos.latitude},${pos.longitude}&destination=${widget.hill.address}}";
+    await launch(Uri.encodeFull(url));
   }
 
   @override
@@ -281,24 +290,46 @@ class _AddEventState extends State<AddEvent> {
                                   Container(
                                     height: MediaQuery.of(context).size.height /
                                         2.74,
-                                    child: FlutterMap(
-                                      options: MapOptions(
-                                        center: LatLng(lat, lng),
-                                        zoom: 16.0,
-                                      ),
-                                      layers: [
-                                        TileLayerOptions(
-                                          urlTemplate:
-                                              "https://api.mapbox.com/styles/v1/tayloryoung/ckw2deumz3jo614rtffqghrre/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoidGF5bG9yeW91bmciLCJhIjoiY2t3MjU0eWN4MGE5YjMxcHhsMjRpd3A0OSJ9.7UmX8FwS_dQQXNd5lgKQIA",
-                                        ),
-                                        MarkerLayerOptions(markers: [
-                                          Marker(
-                                            point: LatLng(lat, lng),
-                                            builder: (BuildContext context) {
-                                              return Icon(Icons.sledding);
-                                            },
+                                    child: Stack(
+                                      alignment: AlignmentDirectional.bottomEnd,
+                                      children: [
+                                        FlutterMap(
+                                          options: MapOptions(
+                                            center: LatLng(lat, lng),
+                                            zoom: 16.0,
                                           ),
-                                        ]),
+                                          layers: [
+                                            TileLayerOptions(
+                                              urlTemplate:
+                                                  "https://api.mapbox.com/styles/v1/tayloryoung/ckw2deumz3jo614rtffqghrre/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoidGF5bG9yeW91bmciLCJhIjoiY2t3MjU0eWN4MGE5YjMxcHhsMjRpd3A0OSJ9.7UmX8FwS_dQQXNd5lgKQIA",
+                                            ),
+                                            MarkerLayerOptions(markers: [
+                                              Marker(
+                                                point: LatLng(lat, lng),
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return const CircleAvatar(
+                                                    child: Icon(Icons.sledding),
+                                                    foregroundColor:
+                                                        Colors.white,
+                                                    backgroundColor:
+                                                        Colors.blue,
+                                                  );
+                                                },
+                                              ),
+                                            ]),
+                                          ],
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(5.0),
+                                          child: ElevatedButton.icon(
+                                            onPressed: () {
+                                              getDirections();
+                                            },
+                                            icon: const Icon(Icons.directions),
+                                            label: const Text("Directions"),
+                                          ),
+                                        )
                                       ],
                                     ),
                                   ),
