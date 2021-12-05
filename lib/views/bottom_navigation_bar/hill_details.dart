@@ -240,9 +240,8 @@ class _AddEventState extends State<AddEvent> {
                         ),
                       ),
                       Container(
-                          height: MediaQuery.of(context)
-                              .size
-                              .height, //height of TabBarView
+                          height: MediaQuery.of(context).size.height /
+                              1.8, //height of TabBarView
                           decoration: BoxDecoration(
                               border: Border(
                                   top: BorderSide(
@@ -295,7 +294,7 @@ class _AddEventState extends State<AddEvent> {
                                       ])),
                                   Container(
                                     height: MediaQuery.of(context).size.height /
-                                        2.74,
+                                        2.65,
                                     child: Stack(
                                       alignment: AlignmentDirectional.bottomEnd,
                                       children: [
