@@ -240,7 +240,9 @@ class _AddEventState extends State<AddEvent> {
                         ),
                       ),
                       Container(
-                          height: 1000, //height of TabBarView
+                          height: MediaQuery.of(context)
+                              .size
+                              .height, //height of TabBarView
                           decoration: BoxDecoration(
                               border: Border(
                                   top: BorderSide(
@@ -299,9 +301,10 @@ class _AddEventState extends State<AddEvent> {
                                       children: [
                                         FlutterMap(
                                           options: MapOptions(
-                                            center: LatLng(lat, lng),
-                                            zoom: 16.0,
-                                          ),
+                                              center: LatLng(lat, lng),
+                                              zoom: 16.0,
+                                              allowPanningOnScrollingParent:
+                                                  false),
                                           layers: [
                                             TileLayerOptions(
                                               urlTemplate:
