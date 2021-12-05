@@ -48,14 +48,12 @@ class _AddEventState extends State<AddEvent> {
 
   @override
   Widget build(BuildContext context) {
-    var isBookmarked = FirestoreHelper.isHillBookmarked(
-        FirebaseAuth.instance.currentUser!.uid, widget.hill.hillID);
     ImagePicker picker = ImagePicker();
     List<XFile>? imageUrl = [];
 
     return Padding(
       padding: EdgeInsets.all(5),
-      child: Column(
+      child: ListView(
         children: [
           Flexible(
               flex: 1,
@@ -181,21 +179,23 @@ class _AddEventState extends State<AddEvent> {
                   children: [
                     IconButton(
                         onPressed: () async {
-                          FirestoreHelper.toggleHillBookmarkFor(
+                          var isBookmarked = FirestoreHelper.isHillBookmarked(
                               FirebaseAuth.instance.currentUser!.uid,
                               widget.hill.hillID);
-
                           if (await isBookmarked == true) {
                             var snackBar =
                                 SnackBar(content: Text('Bookmark Removed!'));
                             ScaffoldMessenger.of(context)
                                 .showSnackBar(snackBar);
-                          } else {
+                          } else if (await isBookmarked == false) {
                             var snackBar =
                                 SnackBar(content: Text('BookMark Added!'));
                             ScaffoldMessenger.of(context)
                                 .showSnackBar(snackBar);
                           }
+                          FirestoreHelper.toggleHillBookmarkFor(
+                              FirebaseAuth.instance.currentUser!.uid,
+                              widget.hill.hillID);
 
                           setState(() {});
                         },
