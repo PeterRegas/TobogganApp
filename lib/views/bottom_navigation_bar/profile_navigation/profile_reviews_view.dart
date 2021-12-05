@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:tobogganapp/firestore_helper.dart';
 import 'package:tobogganapp/model/hill.dart';
@@ -36,7 +37,7 @@ class _ReviewViewState extends State<ReviewView> {
       _loaded = true;
       reviewList = reviews;
       hillNames = hills;
-      print(hillNames[0]!.name);
+      //print(hillNames[0]!.name);
     });
   }
 
@@ -56,11 +57,16 @@ class _ReviewViewState extends State<ReviewView> {
                   padding: const EdgeInsets.fromLTRB(7.5, 0, 7.5, 0),
                   child: Column(
                     children: [
-                      reviewList[index].photos[0],
                       ListTile(
-                        title: Text(hillNames[index]!.name),
+                        title: Text(
+                          hillNames[index]!.name,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         subtitle:
                             starsForRating(reviewList[index].rating.toDouble()),
+                        onTap: () {},
                       ),
                       Container(
                         alignment: Alignment.topLeft,

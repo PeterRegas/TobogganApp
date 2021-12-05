@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tobogganapp/firestore_helper.dart';
 import 'package:tobogganapp/model/hill.dart';
+import 'package:tobogganapp/views/bottom_navigation_bar/hill_details.dart';
 
 class BookmarkView extends StatefulWidget {
   const BookmarkView({Key? key}) : super(key: key);
@@ -47,11 +48,19 @@ class _BookmarkViewState extends State<BookmarkView> {
                   child: Column(
                     children: [
                       ListTile(
-                        title: Text(bookmarkList[index].name.toString()),
-                        subtitle:
-                            Text(bookmarkList[index].information.toString()),
-                        onTap: () {},
-                      ),
+                          title: Text(
+                            bookmarkList[index].name.toString(),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue),
+                          ),
+                          subtitle:
+                              Text(bookmarkList[index].information.toString()),
+                          onTap: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) =>
+                                    Hilldetails(bookmarkList[index])));
+                          }),
                       const Divider(
                         thickness: 1,
                       ),
