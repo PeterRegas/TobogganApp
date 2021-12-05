@@ -293,7 +293,7 @@ class _AddEventState extends State<AddEvent> {
                                       ])),
                                   Container(
                                     height: MediaQuery.of(context).size.height /
-                                        2.74,
+                                        2.2,
                                     child: Stack(
                                       alignment: AlignmentDirectional.bottomEnd,
                                       children: [
