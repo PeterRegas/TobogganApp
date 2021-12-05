@@ -307,7 +307,7 @@ class _AddEventState extends State<AddEvent> {
                                           ])),
                                   Container(
                                     height: MediaQuery.of(context).size.height /
-                                        2.65,
+                                        2.25,
                                     padding:
                                         EdgeInsets.only(left: 10, right: 10),
                                     child: Stack(
