@@ -39,9 +39,11 @@ class AddEvent extends StatefulWidget {
 }
 
 class _AddEventState extends State<AddEvent> {
+  String? _temp;
   @override
   initState() {
     loadPhotos();
+    getWeather();
     super.initState();
   }
 
@@ -57,6 +59,17 @@ class _AddEventState extends State<AddEvent> {
     String url =
         "https://www.google.com/maps/dir/?api=1&origin=${pos.latitude},${pos.longitude}&destination=${widget.hill.address}}";
     await launch(Uri.encodeFull(url));
+  }
+
+  getWeather() async {
+    WeatherFactory wf = WeatherFactory("1945f5fb63d8b8c849f434e5e47277b6");
+    Weather w = await wf.currentWeatherByLocation(
+        widget.hill.geopoint.latitude, widget.hill.geopoint.longitude);
+    double? temperature = w.temperature!.celsius;
+    String temp = temperature!.round().toString();
+    setState(() {
+      _temp = temp;
+    });
   }
 
   @override
@@ -104,18 +117,19 @@ class _AddEventState extends State<AddEvent> {
                             child: Padding(
                                 padding: EdgeInsets.only(left: 5),
                                 child: RichText(
+                                    softWrap: true,
                                     text: TextSpan(
                                         style:
                                             DefaultTextStyle.of(context).style,
                                         children: <TextSpan>[
-                                      TextSpan(
-                                        text: widget.hill.address,
-                                        style: TextStyle(
-                                            fontSize: 11,
-                                            color:
-                                                Colors.black.withOpacity(0.6)),
-                                      )
-                                    ])))),
+                                          TextSpan(
+                                            text: widget.hill.address,
+                                            style: TextStyle(
+                                                fontSize: 11,
+                                                color: Colors.black
+                                                    .withOpacity(0.6)),
+                                          )
+                                        ])))),
                         Container(
                           alignment: Alignment.centerLeft,
                           child: IconTheme(
@@ -129,6 +143,19 @@ class _AddEventState extends State<AddEvent> {
                       ],
                     ),
                   ),
+                  TextButton(
+                      onPressed: () {
+                        var name = widget.hill.name;
+                        SimpleNotification(context).showScheduledNotification(
+                            "Reminder to go Tobogganing",
+                            "Get ready $name is waiting!");
+                        var snackBar = SnackBar(content: Text('Reminder set!'));
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      },
+                      child: Column(children: [
+                        Icon(Icons.notification_add),
+                        Text("Remind me")
+                      ]))
                 ],
               )),
           Divider(),
@@ -251,50 +278,38 @@ class _AddEventState extends State<AddEvent> {
                               child: ListView(
                                 children: [
                                   Padding(
-                                      padding: const EdgeInsets.all(5.0),
-                                      child: Text(widget.hill.information)),
+                                      padding: const EdgeInsets.only(
+                                          top: 10, bottom: 10, left: 10),
+                                      child: Text(
+                                        widget.hill.information,
+                                        style: TextStyle(fontSize: 15),
+                                        softWrap: true,
+                                      )),
                                   TextButton(
                                       onPressed: () async {
-                                        WeatherFactory wf = WeatherFactory(
-                                            "1945f5fb63d8b8c849f434e5e47277b6");
-                                        Weather w =
-                                            await wf.currentWeatherByLocation(
-                                                widget.hill.geopoint.latitude,
-                                                widget.hill.geopoint.longitude);
-                                        double? celsius =
-                                            w.temperature!.celsius;
-                                        setState(() {
-                                          var snackBar = SnackBar(
-                                              content: Text(
-                                                  'Current temperature at hill is: ' +
-                                                      celsius!
-                                                          .round()
-                                                          .toString() +
-                                                      "°C"));
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(snackBar);
-                                        });
+                                        getWeather();
+                                        var snackBar = SnackBar(
+                                            content: Text('Weather Updated!'));
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(snackBar);
                                       },
-                                      child: Column(children: [
-                                        Icon(Icons.wb_sunny),
-                                        Text("Press For Current Temperature")
-                                      ])),
-                                  TextButton(
-                                      onPressed: () {
-                                        var name = widget.hill.name;
-                                        SimpleNotification(context)
-                                            .showScheduledNotification(
-                                                "Reminder to go Tobogganing",
-                                                "Get ready $name is waiting!");
-                                      },
-                                      child: Column(children: [
-                                        Icon(Icons.notification_add),
-                                        Text(
-                                            "Press to be reminded to go to the hill")
-                                      ])),
+                                      child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text("Weather: $_temp °C",
+                                                style: TextStyle(
+                                                    fontSize: 20,
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                            SizedBox(width: 10),
+                                            Icon(Icons.refresh, size: 30),
+                                          ])),
                                   Container(
                                     height: MediaQuery.of(context).size.height /
                                         2.65,
+                                    padding:
+                                        EdgeInsets.only(left: 10, right: 10),
                                     child: Stack(
                                       alignment: AlignmentDirectional.bottomEnd,
                                       children: [
