@@ -13,6 +13,7 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text('Login'),
         automaticallyImplyLeading: false,
@@ -49,20 +50,18 @@ class _LoginState extends State<Login> {
               child:
                   Column(mainAxisAlignment: MainAxisAlignment.start, children: <
                       Widget>[
-                Text("TobogganApp",
-                    style: TextStyle(fontSize: 50, fontFamily: 'Lucida')),
-                // Container(
-                //   width: MediaQuery.of(context).size.width * 0.6,
-                //   height: MediaQuery.of(context).size.height * 0.2,
-                //   decoration: BoxDecoration(
-                //     image: DecorationImage(
-                //       fit: BoxFit.fill,
-                //       image: AssetImage('images/logo.png'),
-                //     ),
-                //   ),
-                // ),
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.7,
+                  height: MediaQuery.of(context).size.height * 0.2,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      fit: BoxFit.fill,
+                      image: AssetImage('images/logo.png'),
+                    ),
+                  ),
+                ),
                 SizedBox(
-                  height: 10,
+                  height: 15,
                 ),
                 TextFormField(
                   decoration: InputDecoration(

@@ -43,17 +43,17 @@ class _CreateAccountState extends State<CreateAccount> {
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: Container(
-              padding: EdgeInsets.only(left: 20, right: 20, top: 5),
+              padding: EdgeInsets.only(left: 20, right: 20, top: 20),
 
               // width: MediaQuery.of(context).size.width,
               child:
                   Column(mainAxisAlignment: MainAxisAlignment.start, children: <
                       Widget>[
-                Text("TobogganApp",
-                    style: TextStyle(fontSize: 50, fontFamily: 'Lucida')),
-                SizedBox(
-                  height: 10,
-                ),
+                // Text("TobogganApp",
+                //     style: TextStyle(fontSize: 50, fontFamily: 'Lucida')),
+                // SizedBox(
+                //   height: 10,
+                // ),
                 TextFormField(
                   decoration: InputDecoration(
                     prefixIcon: Icon(Icons.mail_outline),
