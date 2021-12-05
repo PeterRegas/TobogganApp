@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:tobogganapp/firestore_helper.dart';
 import 'package:tobogganapp/model/hill.dart';
+import 'package:tobogganapp/views/photo_detail.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../review_page/review_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -248,6 +249,9 @@ class _AddEventState extends State<AddEvent> {
                             Center(
                               child: ListView(
                                 children: [
+                                  Padding(
+                                      padding: const EdgeInsets.all(5.0),
+                                      child: Text(widget.hill.information)),
                                   TextButton(
                                       onPressed: () async {
                                         WeatherFactory wf = WeatherFactory(
@@ -346,7 +350,11 @@ class _AddEventState extends State<AddEvent> {
                                 return GestureDetector(
                                   child: widget.photos[index],
                                   onTap: () {
-                                    // navigate to photo detail
+                                    Navigator.push(context,
+                                        MaterialPageRoute(builder: (context) {
+                                      return PhotoDetail(widget.photos[index],
+                                          widget.hill.name);
+                                    }));
                                   },
                                 );
                               },
