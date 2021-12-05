@@ -240,7 +240,7 @@ class _AddEventState extends State<AddEvent> {
                         ),
                       ),
                       Container(
-                          height: 400, //height of TabBarView
+                          height: 1000, //height of TabBarView
                           decoration: BoxDecoration(
                               border: Border(
                                   top: BorderSide(
