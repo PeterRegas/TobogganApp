@@ -40,11 +40,13 @@ class AddEvent extends StatefulWidget {
 
 class _AddEventState extends State<AddEvent> {
   String? _temp;
+  bool? isItBookmarked;
   @override
   initState() {
     loadPhotos();
     getWeather();
     super.initState();
+    isItBookmarked = false;
   }
 
   loadPhotos() async {
@@ -175,8 +177,11 @@ class _AddEventState extends State<AddEvent> {
                                     (ReviewPage(hillObject: widget.hill))),
                           );
                         },
-                        icon: Icon(Icons.star)),
-                    Text("Review"),
+                        icon: Icon(Icons.star, color: Colors.blue)),
+                    Text("Review",
+                        style: TextStyle(
+                          color: Colors.blue,
+                        )),
                   ],
                 )),
                 VerticalDivider(),
@@ -211,8 +216,11 @@ class _AddEventState extends State<AddEvent> {
                             return Hilldetails(hillWithUpdatedDetails);
                           }));
                         },
-                        icon: Icon(Icons.camera_alt)),
-                    Text("Add Photo"),
+                        icon: Icon(Icons.camera_alt, color: Colors.blue)),
+                    Text("Add Photo",
+                        style: TextStyle(
+                          color: Colors.blue,
+                        )),
                   ],
                 )),
                 VerticalDivider(),
@@ -225,11 +233,13 @@ class _AddEventState extends State<AddEvent> {
                               FirebaseAuth.instance.currentUser!.uid,
                               widget.hill.hillID);
                           if (await isBookmarked == true) {
+                            isItBookmarked = true;
                             var snackBar =
                                 SnackBar(content: Text('Bookmark Removed!'));
                             ScaffoldMessenger.of(context)
                                 .showSnackBar(snackBar);
                           } else if (await isBookmarked == false) {
+                            isItBookmarked = false;
                             var snackBar =
                                 SnackBar(content: Text('Bookmark Added!'));
                             ScaffoldMessenger.of(context)
@@ -241,8 +251,13 @@ class _AddEventState extends State<AddEvent> {
 
                           setState(() {});
                         },
-                        icon: Icon(Icons.bookmark)),
-                    Text("Bookmark"),
+                        icon: isItBookmarked!
+                            ? Icon(Icons.bookmark, color: Colors.blue)
+                            : Icon(Icons.bookmark_outline, color: Colors.blue)),
+                    Text("Bookmark",
+                        style: TextStyle(
+                          color: Colors.blue,
+                        )),
                   ],
                 )),
               ])),
