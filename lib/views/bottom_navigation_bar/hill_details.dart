@@ -252,8 +252,8 @@ class _AddEventState extends State<AddEvent> {
                           setState(() {});
                         },
                         icon: isItBookmarked!
-                            ? Icon(Icons.bookmark, color: Colors.blue)
-                            : Icon(Icons.bookmark_outline, color: Colors.blue)),
+                            ? Icon(Icons.bookmark_outline, color: Colors.blue)
+                            : Icon(Icons.bookmark, color: Colors.blue)),
                     Text("Bookmark",
                         style: TextStyle(
                           color: Colors.blue,
