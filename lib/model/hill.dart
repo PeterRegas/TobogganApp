@@ -21,7 +21,7 @@ class Hill {
       sum = sum + review.rating;
     }
 
-    return sum / reviews.length;
+    return reviews.length > 1 ? sum / reviews.length : 0.0;
   }
 
   Future<List<Image>> get photos async {
