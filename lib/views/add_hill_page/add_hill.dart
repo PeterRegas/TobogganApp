@@ -121,6 +121,8 @@ class _addHillState extends State<addHillWidget> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   child: TextFormField(
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
                     decoration: const InputDecoration(
                       label:
                           Text('Information', style: TextStyle(fontSize: 16)),
@@ -167,6 +169,7 @@ class _addHillState extends State<addHillWidget> {
                         _address = await getAddress(
                             latlong.latitude, latlong.longitude);
                         setState(() {
+                          print(_address);
                           _geopoint = latlong;
                           _markers = [
                             Marker(
@@ -222,7 +225,8 @@ class _addHillState extends State<addHillWidget> {
               SnackBar snackBar = SnackBar(content: Text(snackBarMessage));
               ScaffoldMessenger.of(context).showSnackBar(snackBar);
             },
-            child: const Text("Add Hill", style: TextStyle(fontSize: 20)),
+            child: const Center(
+                child: Text("Add Hill", style: TextStyle(fontSize: 20))),
           )
         ],
       ),
