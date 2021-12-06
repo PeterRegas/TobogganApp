@@ -1,6 +1,11 @@
 # tobogganapp
 
-A new Flutter project.
+## Group Members
+
+Taylor Young
+Peter Regas
+Shayan Khosravi
+Sirichai Justin Wong
 
 ## Description
 
