@@ -52,10 +52,7 @@ class _ReviewState extends State<Review> {
               contentPadding: const EdgeInsets.all(0),
               title: Text(widget.hillObject!.name,
                   style: Theme.of(context).textTheme.headline6),
-              subtitle: Text(
-                  widget.hillObject!.geopoint.latitude.toString() +
-                      ', ' +
-                      widget.hillObject!.geopoint.longitude.toString(),
+              subtitle: Text(widget.hillObject!.address,
                   style: Theme.of(context).textTheme.subtitle1),
             ),
             Row(
