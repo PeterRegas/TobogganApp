@@ -167,7 +167,6 @@ class _addHillState extends State<addHillWidget> {
                         _address = await getAddress(
                             latlong.latitude, latlong.longitude);
                         setState(() {
-                          print(_address);
                           _geopoint = latlong;
                           _markers = [
                             Marker(
