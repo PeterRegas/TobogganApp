@@ -231,7 +231,7 @@ class _AddEventState extends State<AddEvent> {
                                 .showSnackBar(snackBar);
                           } else if (await isBookmarked == false) {
                             var snackBar =
-                                SnackBar(content: Text('BookMark Added!'));
+                                SnackBar(content: Text('Bookmark Added!'));
                             ScaffoldMessenger.of(context)
                                 .showSnackBar(snackBar);
                           }
