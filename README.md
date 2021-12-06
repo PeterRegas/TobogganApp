@@ -1,12 +1,13 @@
-# tobogganapp
+# tobogganapp - Group 11
 
 ## Group Members
 
-Taylor Young
-Peter Regas
-Shayan Khosravi
-Sirichai Justin Wong
-
+<ul>
+  <li>Taylor Young</li>
+  <li>Peter Regas</li>
+  <li>Shayan Khosravi</li>
+  <li>Sirichai Justin Wong</li>
+</ul>
 ## Description
 
 ## Create Account
